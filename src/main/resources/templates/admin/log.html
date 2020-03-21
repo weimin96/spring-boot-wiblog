@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head th:replace="admin/common/head :: head(~{::title},~{},~{})">
+    <title>wiblog - Areo的个人网站</title>
+</head>
+
+<body>
+<div id="app">
+    <div class="manage-title">
+        <h2>日志管理</h2>
+    </div>
+    <div class="manage-main">
+            <div id="log-container" style="height: 450px; overflow-y: scroll; background: #333; color: #aaa; padding: 10px;">
+                <div>
+                </div>
+            </div>
+
+    </div>
+
+
+</div>
+
+<div th:replace="admin/common/foot :: adminfoot"></div>
+<script src="/admin/js/log.js"></script>
+</body>
+</html>

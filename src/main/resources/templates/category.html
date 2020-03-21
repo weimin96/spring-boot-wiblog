@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head th:replace="common/head :: head(~{::title},~{::link},~{})">
+
+    <title>wiblog - Areo的个人网站</title>
+
+    <link rel="stylesheet" th:href="@{/css/category.css}">
+</head>
+<body>
+
+<div id="index-wrapper">
+    <div id="index-page">
+        <!--header-->
+        <div th:include="common/header :: header"></div>
+
+    </div>
+
+
+
+    <footer th:include="common/footer :: copyright"></footer>
+</div>
+
+
+<div th:replace="common/foot :: foot"></div>
+<script th:src="@{../js/category.js}"></script>
+</body>
+</html>

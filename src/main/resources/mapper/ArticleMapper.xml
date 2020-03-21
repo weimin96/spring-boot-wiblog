@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiblog.core.mapper.ArticleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiblog.core.entity.Article">
+        <id column="id" property="id"/>
+        <result column="uid" property="uid"/>
+        <result column="author" property="author"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="tags" property="tags"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="img_url" property="imgUrl"/>
+        <result column="article_url" property="articleUrl"/>
+        <result column="article_summary" property="articleSummary"/>
+        <result column="hits" property="hits"/>
+        <result column="likes" property="likes"/>
+        <result column="privately" property="privately"/>
+        <result column="reward" property="reward"/>
+        <result column="comment" property="comment"/>
+        <result column="state" property="state"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+id,uid, author, title, content, tags, category_id, img_url, article_url, article_summary, hits,likes, privately, reward, comment, state,create_time, update_time
+    </sql>
+
+    <select id="selectAllArticle" resultType="map">
+        select title as value from article where state = 1
+    </select>
+
+    <select id="selectPageList" resultType="com.wiblog.core.vo.ArticlePageVo">
+        select
+        a.id,a.uid,a.title,a.author,a.article_summary,a.tags,a.img_url,a.hits,a.privately,a.reward,a.comment,a.article_url,
+        a.likes,count(c2.id) as comments_counts,c.name as categoryName,c.url as
+        categoryUrl,a.create_time
+        from article as a
+        left join category as c on a.category_id = c.id
+        left join comment c2 on c2.article_id = a.id
+        <where>
+            a.state = 1
+            <if test="state != null">
+                and a.privately = #{state}
+            </if>
+        </where>
+        group by a.id order by a.create_time desc
+    </select>
+
+    <select id="selectArticleById" resultType="com.wiblog.core.vo.ArticleVo">
+        select a.id,a.uid,a.title,a.author,a.content,a.tags,a.img_url,a.privately,a.reward,a.comment,
+        a.category_id,a.create_time
+        from article as a
+        where a.state = 1
+    </select>
+
+    <select id="selectArticleByUrl" resultType="com.wiblog.core.vo.ArticleDetailVo">
+        select a.id,a.uid,a.category_id,a.title,a.author,a.article_summary,a.tags,a.img_url,a.hits,a.privately,a.reward,a.comment,a.article_url,a.content,
+        a.likes,count(c2.id) as comments_counts,c.name as categoryName,c.url as categoryUrl,a.create_time
+        from article as a
+        left join category as c on a.category_id = c.id
+        left join comment c2 on c2.article_id = a.id
+        where a.article_url = #{url} and a.state = 1
+        group by a.id
+    </select>
+
+    <update id="updateByCategoryId">
+        update article set category_id = -1 where category_id = #{id}
+    </update>
+
+    <update id="updateState" parameterType="java.lang.Long">
+        update article set state = 0 where id = #{id}
+    </update>
+
+    <update id="updateHitsBatch" parameterType="java.util.List">
+        update article
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="hits = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.hits}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <update id="updateLikesBatch" parameterType="java.util.List">
+        update article
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="likes = case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id = #{item.id} then #{item.likes}
+                </foreach>
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
+
+    <select id="selectArticleByIds" parameterType="java.util.List" resultType="com.wiblog.core.entity.Article">
+        select
+        <include refid="Base_Column_List"/>
+        from article
+        where id in
+        <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+            #{item}
+        </foreach>
+    </select>
+</mapper>

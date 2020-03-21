@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:display="http://www.w3.org/1999/xhtml">
+<head th:replace="admin/common/head :: head(~{::title},~{::link},~{})">
+    <title>wiblog - Areo的个人网站</title>
+
+    <link th:href="@{/admin/css/style.css}" rel="stylesheet">
+</head>
+
+<body>
+<div id="pageWrapper">
+    <!--顶部导航栏-->
+    <div class="header-nav">
+        <div class="header-inner">
+            <div class="header-unit header-logo">
+                <div>
+                    <a target="_blank" class="logo-inner" href="/" title="wiblog">
+                        <img class="logo-icon" src="/img/logo.svg" alt="">
+                    </a>
+                </div>
+            </div>
+            <div class="header-unit header-service">
+                <div class="nav-overview">
+                    <a class="overview-inner" href="/">
+                        <span>总览</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--左侧导航栏-->
+    <div id="container" class="web-container" style="left: 0px;">
+        <div class="aside">
+            <div class="aside-area">
+                <div class="aside-area-main">
+                    <!--标题-->
+                    <h2 class="aside-title">
+                        <!--收缩后图标-->
+                        <img class="aside-logo"
+                             src="/img/manage.svg">
+                        <span>管理后台</span>
+                    </h2>
+                    <ul class="aside-list">
+                        <!--概览-->
+                        <li>
+                            <a class="aside-level-1 iframe_item" href="javascript:void(0);" data-url="/admin/home" target="_self">
+                                <img class="aside-icon"
+                                     src="/img/overview.svg">
+                                <span>概览</span>
+                            </a>
+                        </li>
+                        <!--用户管理-->
+                        <li>
+                            <a class="aside-level-1 iframe_item" href="javascript:void(0);" data-url="/admin/user" target="_self">
+                                <img class="aside-icon"
+                                     src="/img/user.svg">
+                                <span>用户管理</span>
+                            </a>
+                        </li>
+                        <!--文章管理-->
+                        <li class="aside-select-li">
+                            <a class="aside-level-1" href="javascript:;">
+                                <img class="aside-icon"
+                                     src="/img/article.svg">
+                                <span>文章管理</span>
+                                <i class="aside-up-icon">开</i></a>
+                            <ul class="aside-subitem">
+                                <li>
+                                    <a class="aside-level-2 iframe_item" href="javascript:void(0);" data-url="/admin/articleList" target="_self">
+                                        <span>文章列表</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="aside-level-2 iframe_item" href="javascript:void(0);" data-url="/admin/articleEdit" target="_self">
+                                        <span>文章编辑</span>
+                                    </a>
+                                </li>
+
+                            </ul>
+                        </li>
+                        <!--评论管理-->
+                        <li>
+                            <a class="aside-level-1 iframe_item" href="javascript:void(0);" data-url="/admin/comment" target="_self">
+                                <img class="aside-icon"
+                                     src="/img/comment.svg">
+                                <span>评论管理</span>
+                            </a>
+                        </li>
+                        <!--分类管理-->
+                        <li>
+                            <a class="aside-level-1 iframe_item" href="javascript:void(0);" data-url="/admin/category" target="_self">
+                                <img class="aside-icon"
+                                     src="/img/classify.svg">
+                                <span>分类管理</span>
+                            </a>
+                        </li>
+                        <!--打赏管理-->
+                        <li>
+                            <a class="aside-level-1 iframe_item" href="javascript:void(0);" data-url="/admin/home" target="_self">
+                                <img class="aside-icon"
+                                     src="/img/reward.svg">
+                                <span>打赏管理</span>
+                            </a>
+                        </li>
+                        <!--图片管理-->
+                        <li>
+                            <a class="aside-level-1 iframe_item" href="javascript:void(0);" data-url="/admin/pic" target="_self">
+                                <img class="aside-icon"
+                                     src="/img/pic.svg">
+                                <span>图片管理</span>
+                            </a>
+                        </li>
+                        <!--日志管理-->
+                        <li>
+                            <a class="aside-level-1 iframe_item" href="javascript:void(0);" data-url="/admin/log" target="_self">
+                                <img class="aside-icon"
+                                     src="/img/log.svg">
+                                <span>日志管理</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="menu-fold"><i></i></div>
+            <div style="display: none">
+                <div>
+                    <a href="javascript:;" class="menu-tip-close"></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="main" id="appArea">
+            <iframe id="iframe" src="/admin/home"></iframe>
+        </div>
+    </div>
+</div>
+</body>
+<script src="/lib/jquery.min.js" type="text/javascript"></script>
+<script src="/admin/js/index.js"></script>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head th:replace="common/head :: head(~{::title},~{::link},~{})">
+    <title>wiblog - Areo的个人网站</title>
+    <link rel="stylesheet" th:href="@{css/loginAndRegister.css}">
+
+</head>
+<body>
+<div class="bg-img">
+</div>
+<div th:include="common/header :: header"></div>
+<div id="app" class="container" >
+    <div class="login-label">
+        <div class="login-top">
+            <div class="login-title-label">
+                <span class="login-title">欢迎登录<span>wiblog</span></span>
+            </div>
+            <div class="login-form">
+                <el-input class="first-input"
+                        placeholder="用户名|手机号|邮箱"
+                          @keyup.enter.native="login"
+                        v-model.trim="account" autocomplete="off">
+                    <i slot="prefix" class="el-input__icon el-icon-user"></i>
+                </el-input>
+                <el-input
+                        placeholder="密码"
+                        v-model.trim="password"
+                        @keyup.enter.native="login"
+                        autocomplete="off"
+                        show-password="true">
+                    <i slot="prefix" class="el-input__icon el-icon-lock"></i>
+                </el-input>
+                <div class="error-msg">{{msgError}}</div>
+                <div>
+                    <el-button type="primary" v-on:click="login">登录</el-button>
+                </div>
+
+                <div class="hasAccount">
+                    <div >没有账号？<a href="/register">点击注册</a></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="login-bottom">
+            <div class="h-content">
+                其他方式登录
+            </div>
+            <div class="login-else">
+                <img src="/img/github_black.svg" alt="" @click="githubLogin">
+                <img src="/img/weibo_red.svg" alt="">
+            </div>
+        </div>
+    </div>
+
+</div>
+<!--<footer th:include="common/footer :: copyright"></footer>-->
+
+
+
+</body>
+<div th:replace="common/foot :: foot"></div>
+<script th:src="@{js/login.js}"></script>
+</html>

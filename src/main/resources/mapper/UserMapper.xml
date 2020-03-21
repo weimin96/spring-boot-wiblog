@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiblog.core.mapper.UserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiblog.core.entity.User">
+        <id column="uid" property="uid"/>
+        <result column="username" property="username"/>
+        <result column="sex" property="sex"/>
+        <result column="avatar_img" property="avatarImg"/>
+        <result column="intro" property="intro"/>
+        <result column="region" property="region"/>
+        <result column="city" property="city"/>
+        <result column="state" property="state"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+uid, username, sex, avatar_img,state, intro,region,city,create_time
+    </sql>
+
+    <insert id="insertReturnId" useGeneratedKeys="true" keyColumn="uid" keyProperty="uid">
+        insert into user(username,avatar_img,region,city,create_time,intro)
+        values(#{username},#{avatarImg},#{region},#{city},now(),"")
+    </insert>
+
+
+    <select id="selectUsername" resultType="map">
+        select username as value from user where state = 1
+    </select>
+
+    <select id="selectUserManagePage" resultType="com.wiblog.core.vo.UserVo">
+        select
+        uid, username, sex, avatar_img,region,city,state, create_time
+        from user
+        <where>
+            <if test="state != null">
+                and state = #{state}
+            </if>
+            <if test="username != null and username != ''">
+                and username like concat('%',#{username},'%')
+            </if>
+        </where>
+    </select>
+
+    <update id="updateStateToZero">
+        update user
+        set state = 0
+        where uid = #{uid}
+    </update>
+
+    <update id="updateDetail">
+        update user
+        <set>
+            <if test="sex != null and sex !=''">
+                sex = #{sex},
+            </if>
+            <if test="avatarImg != null and avatarImg !=''">
+                avatar_img = #{avatarImg},
+            </if>
+            <if test="intro != null and intro !=''">
+                intro = #{intro},
+            </if>
+            <if test="city != null and city !=''">
+                city = #{city},
+            </if>
+        </set>
+        where uid = #{uid}
+    </update>
+
+</mapper>

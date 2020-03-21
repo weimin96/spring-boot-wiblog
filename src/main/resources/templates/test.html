@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>语音测试</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
+    <link rel="stylesheet" href="https://res.wx.qq.com/open/libs/weui/1.1.3/weui.min.css">
+    <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"
+          rel="stylesheet">
+    <style>
+        .voice {
+            height: 40px;
+            font-size: 18px;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            text-align: center;
+            z-index: 6000;
+            padding: 4px;
+            background-color: #c5c4c4;
+            font-weight: 300;
+            border-radius: 4px;
+        }
+
+        .before-color {
+            color: #0f7682
+        }
+
+        .mask {
+            display: none;
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 5999;
+        }
+    </style>
+</head>
+<body>
+<div>
+    <!--蒙版-->
+    <div class="mask"></div>
+    <!--搜索框-->
+    <div class="weui-search-bar" id="searchBar">
+        <form class="weui-search-bar__form">
+            <div class="weui-search-bar__box">
+                <i class="weui-icon-search"></i>
+                <input type="search" class="weui-search-bar__input" id="searchInput"
+                       placeholder="搜索" required="">
+                <a href="javascript:" class="weui-icon-clear" id="searchClear"></a>
+            </div>
+            <label class="weui-search-bar__label" id="searchText"
+                   style="transform-origin: 0px 0px 0px; opacity: 1; transform: scale(1, 1);">
+                <i class="weui-icon-search"></i>
+                <span>搜索</span>
+            </label>
+        </form>
+        <a href="javascript:" class="weui-search-bar__cancel-btn" id="searchCancel">取消</a>
+    </div>
+
+    <div class="weui-cells searchbar-result" id="searchResult" style="display: none;">
+        <div class="weui-cell weui-cell_access">
+            <div class="weui-cell__bd weui-cell_primary">
+                <p>实时搜索文本</p>
+            </div>
+        </div>
+    </div>
+
+    <!--<span id="talk-btn" class="voice fa-stack fa-2x before-color">
+        <i class="fa fa-circle fa-stack-2x"></i>
+        <i class="fa fa-microphone fa-stack-1x fa-inverse"></i>
+    </span>-->
+
+    <select id="choice">
+        <option value="1">微信</option>
+        <option value="2">讯飞</option>
+        <option value="3">阿里</option>
+    </select><br>
+    <div id="text">语音识别：</div><br>
+    <a id="talk-btn" class="voice">按住 说话</a>
+
+
+    <div id="toast" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-info-circle weui-icon_toast" style="margin-top: 37px;"></i>
+            <p class="weui-toast__content">录音时间过短</p>
+        </div>
+    </div>
+
+    <div id="toast1" style="display: none;">
+        <div class="weui-mask_transparent"></div>
+        <div class="weui-toast">
+            <i class="weui-icon-info-circle weui-icon_toast" style="margin-top: 37px;"></i>
+            <p class="weui-toast__content">没有匹配地名</p>
+        </div>
+    </div>
+
+</div>
+<script src="../lib/jquery-3.4.0.min.js"></script>
+<script src="http://res.wx.qq.com/open/js/jweixin-1.4.0.js"></script>
+<!--<script src="https://cdn.bootcss.com/vConsole/3.2.0/vconsole.min.js"></script>-->
+
+
+<script type="text/javascript">
+
+    // var vConsole = new VConsole();
+    $(function () {
+        $.get("/weixin/sign", {url: location.href.split('#')[0]}, function (res) {
+            wx.config({
+                debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                appId: res.appId, // 必填，公众号的唯一标识
+                timestamp: res.timestamp, // 必填，生成签名的时间戳
+                nonceStr: res.nonceStr, // 必填，生成签名的随机串
+                signature: res.signature,// 必填，签名，见附录1
+                jsApiList: ["startRecord", "stopRecord", "translateVoice", "uploadVoice"] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+            });
+        });
+
+        var START, END;
+        const voice = {};
+        var $talk = $('#talk-btn');
+
+        $talk.on({
+            //按下开始录音
+            touchstart: function (event) {
+                event.preventDefault();
+                $(".mask").css("display", "block");
+                // $(".voice").css("color", "#12555d");
+                cancelSearch();
+                START = new Date().getTime();
+
+                recordTimer = setTimeout(function () {
+                    wx.startRecord({
+                        success: function () {
+                            console.log('录音');
+                            localStorage.rainAllowRecord = 'true';
+                        },
+                        cancel: function () {
+                            console.log('用户拒绝授权录音');
+                        }
+                    });
+                }, 300);
+            },
+
+            //松手结束录音
+            touchend: function (event) {
+                //event.preventDefault();
+                $(".mask").css("display", "none");
+                // $(".voice").css("color", "#0f7682");
+                END = new Date().getTime();
+                if ((END - START) < 300) {
+                    END = 0;
+                    START = 0;
+                    //小于300ms，不录音
+                    clearTimeout(recordTimer);
+                    showToast();
+                    console.log("时间过短");
+                } else {
+                    wx.stopRecord({
+                        success: function (res) {
+                            console.log("结束录音");
+                            voice.localId = res.localId;
+                            var choice = $("#choice").val();
+                            if (1 == choice){
+                                translate(res.localId);
+                            }else if (2 == choice){
+                                uploadVoice("/getVoiceByXunFei");
+                            }else if (3 == choice){
+                                uploadVoice("/getVoiceByAliYun");
+                            }
+                        },
+                        fail: function (res) {
+                            console.log(JSON.stringify(res));
+                        }
+                    });
+                }
+            }
+        });
+
+        //上传录音
+        function uploadVoice(url) {
+            //调用微信的上传录音接口把本地录音先上传到微信的服务器
+            //不过，微信只保留3天，而我们需要长期保存，我们需要把资源从微信服务器下载到自己的服务器
+            wx.uploadVoice({
+                localId: voice.localId, // 需要上传的音频的本地ID，由stopRecord接口获得
+                isShowProgressTips: 1, // 默认为1，显示进度提示
+                success: function (res) {
+                    console.log(JSON.stringify(res));
+                    //把录音在微信服务器上的id（res.serverId）发送到自己的服务器供下载。
+                    $.ajax({
+                        url: url,
+                        type: 'get',
+                        data: {
+                            mediaId: res.serverId
+                        },
+                        dataType: "json",
+                        success: function (data) {
+                            console.log(data); // 语音识别的结果
+                            $searchBar.addClass('weui-search-bar_focusing');
+                            $searchInput.focus();
+                            $("#text").html("语音识别："+data.msg);
+                            wordFilter(data.msg);
+                            // $searchInput.val(data.msg);
+                        },
+                        error: function (xhr, errorType, error) {
+                            console.log(error);
+                        }
+                    });
+                }
+            });
+        }
+
+        //语音识别
+        function translate(localId) {
+            // 获取识别内容
+            wx.translateVoice({
+                localId: localId, // 需要识别的音频的本地Id，由录音相关接口获得
+                isShowProgressTips: 1, // 默认为1，显示进度提示
+                success: function (res) {
+                    console.log(res.translateResult); // 语音识别的结果
+                    $searchBar.addClass('weui-search-bar_focusing');
+                    $searchInput.focus();
+                    $("#text").html("语音识别："+res.translateResult);
+                    wordFilter(res.translateResult);
+                }
+            });
+        }
+        
+        function wordFilter(text) {
+            $.get("/weixin/wordFilter",{text:text},function (res) {
+                console.log(res);
+                if (res == ""){
+                    showToast1();
+                    return;
+                }
+                $searchInput.val(res);
+            })
+        }
+
+
+        var $searchBar = $('#searchBar'),
+            $searchResult = $('#searchResult'),
+            $searchText = $('#searchText'),
+            $searchInput = $('#searchInput'),
+            $searchClear = $('#searchClear'),
+            $searchCancel = $('#searchCancel');
+
+        function hideSearchResult() {
+            $searchResult.hide();
+            $searchInput.val('');
+        }
+
+        function cancelSearch() {
+            hideSearchResult();
+            $searchBar.removeClass('weui-search-bar_focusing');
+            $searchText.show();
+        }
+
+        $searchText.on('click', function () {
+            $searchBar.addClass('weui-search-bar_focusing');
+            $searchInput.focus();
+        });
+        $searchInput
+            .on('blur', function () {
+                if (!this.value.length) cancelSearch();
+            })
+            .on('input', function () {
+                if (this.value.length) {
+                    $searchResult.show();
+                } else {
+                    $searchResult.hide();
+                }
+            })
+        ;
+        $searchClear.on('click', function () {
+            hideSearchResult();
+            $searchInput.focus();
+        });
+        $searchCancel.on('click', function () {
+            cancelSearch();
+            $searchInput.blur();
+        });
+    });
+
+
+    function showToast() {
+        var $toast = $('#toast');
+        if ($toast.css('display') != 'none') return;
+        $toast.fadeIn(100);
+        setTimeout(function () {
+            $toast.fadeOut(100);
+        }, 2000);
+    }
+
+    function showToast1() {
+        var $toast1 = $('#toast1');
+        if ($toast1.css('display') != 'none') return;
+        $toast1.fadeIn(100);
+        setTimeout(function () {
+            $toast1.fadeOut(100);
+        }, 2000);
+    }
+
+</script>
+
+</body>
+</html>

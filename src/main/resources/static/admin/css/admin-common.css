@@ -1,0 +1,84 @@
+body,h2{
+    margin: 0;
+    padding: 0;
+}
+body{
+    font-size: 14px;
+}
+
+html,body,.manage-main,#app,.el-row{
+    /*height: 100%;*/
+}
+.manage-title{
+    color: #000;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    background-color: #fff !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 0;
+    height: auto;
+    line-height: inherit;
+    min-height: inherit;
+    position: relative;
+    border-bottom: 1px solid #ddd;
+}
+
+.manage-title h2{
+    font-size: 16px;
+    font-weight: 700;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 20px;
+    max-width: 70%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    height: 30px;
+    line-height: 30px;
+}
+
+.manage-main{
+    padding: 0 20px 20px;
+    background-color: #f2f2f2;
+    margin-top: 15px;
+}
+
+.el-radio-group{
+    margin-right: 10px;
+}
+
+.switch-group{
+    margin: 20px 10px 10px;
+}
+
+.switch-group span{
+    margin-left: 5px;
+}
+
+.img-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+.img-uploader .el-upload:hover {
+    border-color: #409EFF;
+}
+.img-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 178px;
+    height: 178px;
+    line-height: 178px;
+    text-align: center;
+}
+.article-img {
+    width: 240px;
+    height: 145px;
+    display: block;
+}
+

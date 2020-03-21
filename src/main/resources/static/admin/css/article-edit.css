@@ -1,0 +1,71 @@
+.title-input{
+    width: 90%;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    font-weight: 700;
+    font-size: 20px;
+    color: #1c1f21;
+    line-height: 30px;
+    box-sizing: content-box;
+    outline: 0;
+    border: 0;
+    overflow: visible;
+    margin: 10px;
+}
+
+/*.v-note-panel,.v-note-op{
+    box-shadow: 0 0 0 transparent!important;
+}
+.v-note-panel{
+    height: 350px;
+}
+
+.v-note-op{
+    width: 49%!important;
+    background: #f3f5f6!important;
+    margin-left: 10px;
+    padding-left: 10px;
+    border-radius: 5px;
+}
+.v-show-content{
+    background: #fff!important;
+}
+.markdown-body{
+    margin-bottom: 10px;
+}*/
+
+.input-new-tag {
+    width: 90px;
+    margin-left: 10px;
+    vertical-align: bottom;
+}
+
+.el-tag + .el-tag {
+    margin-left: 10px;
+}
+.button-new-tag {
+    margin-left: 10px;
+    height: 32px;
+    line-height: 30px;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.post-btn{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.input-title{
+    margin: 10px;
+    width: 50%;
+}
+
+.el-select{
+    width:180px;
+}
+
+
+

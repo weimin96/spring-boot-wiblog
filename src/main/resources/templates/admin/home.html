@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head th:replace="admin/common/head :: head(~{::title},~{::link},~{})">
+
+    <title>后台</title>
+    <link rel="stylesheet" th:href="@{/admin/css/home.css}">
+</head>
+<body>
+<div id="app">
+    <div class="manage-title">
+        <h2>概览</h2>
+    </div>
+    <div class="manage-main">
+        <el-row :gutter="20">
+            <el-col :span="8">
+                <div class="card">
+                    <div class="card-title">
+                        用户
+                    </div>
+                    <div class="card-body">
+
+                    </div>
+                </div>
+            </el-col>
+            <el-col :span="16">
+                <div class="card">
+                    <div class="card-title">
+                        统计
+                    </div>
+                    <div class="card-body">
+                        <ul class="stat-list">
+                            <template>
+                                <li>
+                                    <div>{{staticData.articleCount}}</div>
+                                    <div>文章数</div>
+                                </li>
+                                <li>
+                                    <div>{{staticData.commentCount}}</div>
+                                    <div>评论数</div>
+                                </li>
+                                <li>
+                                    <div>{{staticData.hitCount}}</div>
+                                    <div>点击量</div>
+                                </li>
+                                <li>
+                                    <div>{{staticData.userCount}}</div>
+                                    <div>用户数</div>
+                                </li>
+                                <li>
+                                    <div>{{staticData.profitCount}}</div>
+                                    <div>总收益</div>
+                                </li>
+                            </template>
+                        </ul>
+                    </div>
+                </div>
+            </el-col>
+        </el-row>
+        <el-row :gutter="20">
+            <el-col :span="16">
+                <div class="card">
+                    <div class="card-title">系统状态</div>
+                    <div class="group-button">
+                        <button v-bind:class="{active: type===1}" @click="chooseType(1)">今天</button>
+                        <button v-bind:class="{active: type===2}" @click="chooseType(2)">近三天</button>
+                        <button v-bind:class="{active: type===3}" @click="chooseType(3)">近七天</button>
+                        <button v-bind:class="{active: type===4}" @click="chooseType(4)">近三十天</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="sysChart" style="width: 100%;height:300px;"></div>
+                    </div>
+                </div>
+            </el-col>
+            <el-col :span="8">
+                <div class="card">
+                    <div class="card-body" style="margin-top: 88px">
+                        <div id="hitChart" style="width: 100%;height:300px;"></div>
+                    </div>
+                </div>
+            </el-col>
+
+        </el-row>
+    </div>
+</div>
+
+<div th:replace="admin/common/foot :: adminfoot"></div>
+<script src="/lib/echarts.min.js"></script>
+<script src="/admin/js/home.js"></script>
+</body>
+
+</html>
