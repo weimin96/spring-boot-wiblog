@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:display="http://www.w3.org/1999/xhtml">
+<head th:replace="admin/common/head :: head(~{::title},~{::link},~{})">
+    <title>wiblog - Areo的个人网站</title>
+    <link rel="stylesheet" href="/lib/editor.md/css/editormd.min.css"/>
+    <link rel="stylesheet" href="/admin/css/article-edit.css">
+</head>
+
+<body>
+<div id="app">
+    <div class="manage-title">
+        <h2>文章编辑</h2>
+    </div>
+    <div class="manage-main">
+        <el-row>
+            <el-col :span="24" style="background: #fff;border-radius: 10px 10px 0 0;">
+
+                <el-upload
+                        class="img-uploader"
+                        action="/uploadImage"
+                        :show-file-list="false"
+                        :on-success="uploadImgSuccess"
+                        accept=".jpg,.png,.jpeg">
+                    <img v-if="article.imgUrl" :src="article.imgUrl" class="article-img">
+                    <i v-else class="el-icon-plus img-uploader-icon">上传题图</i>
+                </el-upload>
+
+                <div class="input-title">
+                    <el-input v-model="article.title" placeholder="请在此输入标题..."></el-input>
+                </div>
+
+                <template>
+                    <div style="margin: 10px">
+                        <el-cascader :options="categoryList" @change="changeCategory"
+                                     v-model="categoryIds"
+                                     :props="{ expandTrigger: 'hover' }"
+                                     placeholder="文章分类"></el-cascader>
+
+
+                        <el-tag :key="tag" v-for="tag in tagList" closable
+                                :disable-transitions="false"
+                                type="info" effect="dark" class="button-new-tag"
+                                @close="handleClose(tag)">
+                            {{tag}}
+                        </el-tag>
+
+                        <el-input class="input-new-tag" v-if="isShowTagInput" v-model="tagTemp"
+                                  ref="saveTagInput" size="small"
+                                  @keyup.enter.native="handleInputConfirm"
+                                  @blur="handleInputConfirm"></el-input>
+                        <el-button v-else class="button-new-tag" type="success" size="small"
+                                   @click="showTagInput">
+                            + 添加标签
+                        </el-button>
+                    </div>
+                </template>
+
+                <template>
+                    <div class="switch-group">
+
+                        <span v-if="article.privately">关闭阅读</span><span v-else>开放阅读</span>
+                        <el-switch
+                                v-model="article.privately"
+                                active-color="#ff4949"
+                                inactive-color="#13ce66"
+                                :active-value=true
+                                :inactive-value=false>
+                        </el-switch>
+                        <span v-if="article.comment">开放评论</span><span v-else>关闭评论</span>
+                        <el-switch
+                                v-model="article.comment"
+                                active-color="#ff4949"
+                                inactive-color="#13ce66"
+                                :active-value=false
+                                :inactive-value=true>
+                        </el-switch>
+                        <span v-if="article.reward">开放赞赏</span><span v-else>关闭赞赏</span>
+                        <el-switch
+                                v-model="article.reward"
+                                active-color="#ff4949"
+                                inactive-color="#13ce66"
+                                :active-value=false
+                                :inactive-value=true>
+                        </el-switch>
+
+
+                    </div>
+                </template>
+
+                <el-button class="post-btn" type="primary" round @click="pushArticle"
+                           v-loading.fullscreen.lock="pushLoading">发表文章
+                </el-button>
+
+
+            </el-col>
+            <el-col :span="24" style="background: #fff;border-radius:0 0 10px 10px;padding:10px">
+                <template>
+                    <!--<div id="layout">-->
+                    <div id="editor">
+                        <textarea></textarea>
+                    </div>
+                    <!--</div>-->
+                </template>
+            </el-col>
+        </el-row>
+
+    </div>
+
+</div>
+
+<!-- 全局js -->
+<div th:replace="admin/common/foot :: adminfoot"></div>
+<!--<script type="text/javascript" src="../lib/mavonEditor-2.5.4/mavon-editor.js"></script>-->
+<script src="../lib/editor.md/editormd.min.js"></script>
+<script src="/admin/js/articleEdit.js"></script>
+</body>
+</html>

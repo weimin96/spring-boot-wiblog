@@ -1,0 +1,62 @@
+.tools{
+
+}
+
+.tools span{
+    cursor: pointer;
+    color: #666;
+    font-size: 12px;
+    line-height: 42px;
+}
+
+.tools span:nth-child(2),.tools span:nth-child(3){
+    float: right;
+    margin-left: 10px;
+}
+
+
+.card{
+    background-color: #fff;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(26, 26, 26, .1);
+}
+
+.title{
+    line-height: 1.54;
+    padding-bottom: 10px;
+    font-weight: 400;
+    font-size: medium;
+    margin-bottom: 1px;
+}
+
+.title p{
+    display: inline-block;
+    color: red;
+    font-weight: bold;
+}
+
+.abstract{
+    font-size: 13px;
+}
+
+.abstract p{
+    color: red;
+    display: inline;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.abstract .category{
+    margin-top: 8px;
+}
+
+.category-tag{
+    height: 25px;
+    line-height: 25px;
+}
+
+.main .card:last-child{
+    margin-bottom: 100px;
+}

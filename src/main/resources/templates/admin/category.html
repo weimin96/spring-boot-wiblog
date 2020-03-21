@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head th:replace="admin/common/head :: head(~{::title},~{},~{})">
+    <title>wiblog - Areo的个人网站</title>
+</head>
+
+<body>
+<div id="app">
+    <div class="manage-title">
+        <h2>分类管理</h2>
+    </div>
+    <div class="manage-main">
+        <template>
+            <el-button type="primary" plain
+                       @click="addCategoryDialog({id:0},'add')">新增
+            </el-button>
+            <el-button type="primary" plain
+                       @click="updateCache()">更新缓存
+            </el-button>
+            <el-table
+                    :data="categoryList"
+                    style="width: 100%;margin-bottom: 20px;"
+                    row-key="id"
+                    border
+                    default-expand-all
+                    :tree-props="{children: 'children', hasChildren: 'hasChildren'}">
+                <el-table-column prop="name" label="名称" width="180"></el-table-column>
+                <el-table-column prop="level" label="级别" width="180"></el-table-column>
+                <el-table-column prop="rank" label="排序" sortable></el-table-column>
+                <el-table-column prop="fullUrl" label="地址"></el-table-column>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-button size="mini" type="primary" plain
+                                   @click="addCategoryDialog(scope.row,'add')">插入
+                        </el-button>
+                        <el-button size="mini" type="success" plain
+                                   @click="addCategoryDialog(scope.row,'update')">修改
+                        </el-button>
+                        <el-button size="mini" type="danger" plain
+                                   @click="delCategory(scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </template>
+    </div>
+
+    <el-dialog :title="title" :visible.sync="addCategoryVisible" width="30%">
+        <span>分类名称：</span><el-input v-model="name">{{name}}</el-input>
+        <span>分类链接：</span><el-input v-model="url">{{url}}</el-input>
+        <template v-if="type === 'update'">
+            <span>分类排序：</span><el-input v-model="rank">{{rank}}</el-input>
+        </template>
+        <span slot="footer" class="dialog-footer">
+    <el-button @click="addCategoryVisible = false">取 消</el-button>
+    <el-button type="primary" @click="addCategory">确 定</el-button>
+  </span>
+    </el-dialog>
+</div>
+
+<div th:replace="admin/common/foot :: adminfoot"></div>
+<script src="/admin/js/category.js"></script>
+</body>
+</html>

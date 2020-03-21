@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiblog.core.mapper.MessageMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiblog.core.entity.Message">
+            <id column="id" property="id"/>
+            <result column="uid" property="uid"/>
+            <result column="type" property="type"/>
+            <result column="content" property="content"/>
+            <result column="title" property="title"/>
+            <result column="state" property="state"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+id, uid, type, content, title, state, create_time, update_time
+    </sql>
+
+    <select id="selectCountList" resultType="map" parameterType="long">
+        select count(*) as count,type
+        from message
+        where uid = #{uid}
+        group by type
+    </select>
+</mapper>

@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head th:replace="common/head :: head(~{::title},~{::link},~{})">
+
+    <title>wiblog - Areo的个人网站</title>
+    <link rel="stylesheet" th:href="@{../lib/city-picker/city-picker.css}">
+    <link rel="stylesheet" th:href="@{/css/user.css}">
+</head>
+<body>
+
+<div id="index-wrapper">
+    <div id="index-page">
+        <!--header-->
+        <div th:include="common/header :: header"></div>
+        <!--body-->
+        <div id="app">
+            <!--头部-->
+            <div class="user-header">
+
+                <template>
+                    <div class="user-info">
+
+
+                        <div class="user-pic">
+                            <el-avatar :size="148"
+                                       :src="user.avatarImg"></el-avatar>
+                        </div>
+
+                        <div class="user-data">
+                            <!--用户名-->
+                            <div class="name">{{user.username}}</div>
+                            <!--信息-->
+                            <div class="information"><span v-if="user.sex === 'male'">男</span><span
+                                    v-else>女</span><span>{{user.region}}</span><span>{{user.city}}</span></div>
+                            <div class="more-info" @click="moreInfo"><i class="el-icon-arrow-down"></i><a>更多信息</a></div>
+                            <div id="intro">个人介绍：{{user.intro}}</div>
+                        </div>
+
+                        <!--统计-->
+                        <div class="user-statistic">
+                            <div class="item">
+                                <span>0</span>
+                                <div>评论</div>
+                            </div>
+                            <div class="item">
+                                <span>0</span>
+                                <div>获赞</div>
+                            </div>
+                            <div class="item">
+                                <span>0</span>
+                                <div>赞赏</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </template>
+            </div>
+            <!--内容-->
+            <el-row class="user-body">
+
+                <el-col :span="24">
+                    <!--内容-->
+                    <div class="user-content">
+                        <el-row :gutter="20">
+                            <el-col :offset="2" :span="3">
+                                <!--侧边栏-->
+                                <div class="sidebar">
+                                    <ul>
+                                        <li :class="{sidebarActive:sidebarActive === 'message'} "
+                                            @click="sidebarActive = 'message'"><i
+                                                class="fa fa-commenting-o"></i>我的消息
+                                        </li>
+                                        <li :class="{sidebarActive:sidebarActive === 'userSetting'}"
+                                            @click="gotoUserSetting"><i
+                                                class="el-icon-s-tools"></i>个人设置
+                                        </li>
+                                        <li :class="{sidebarActive:sidebarActive === 'user'}"
+                                            @click="sidebarActive = 'user'"><i
+                                                class="fa fa-user"></i>我的帐户
+                                        </li>
+                                    </ul>
+                                </div>
+                            </el-col>
+                            <el-col :span="16" >
+                                <template v-if="sidebarActive === 'message'">
+                                    <el-tabs v-model="activeName">
+                                        <el-tab-pane label="我的回复" name="first">
+                                            <div class="order">
+                                                <div class="pull-right">
+                                                    <a class="" @click="getUserComment('asc')"
+                                                       v-bind:class="{active : 'asc' === userCommentOrderBy}">按时间正序</a>
+                                                    <a class="" @click="getUserComment('desc')"
+                                                       v-bind:class="{active : 'desc' === userCommentOrderBy}">按时间倒序</a>
+                                                </div>
+                                            </div>
+                                            <div v-if="userComment.length === 0" class="no-data">
+                                                暂无内容
+                                            </div>
+                                            <div class="comment-card" v-for="item in userComment">
+                                                <div class="comment-top">
+                                                    <div class="comment-top-left">
+                                                        <span>{{user.username}}</span>
+                                                        <span>回复：</span>
+                                                    </div>
+                                                    <div class="comment-top-right">{{item.createTime
+                                                        | commentDateFormat}}
+                                                    </div>
+                                                </div>
+                                                <div class="comment-content">{{item.content}}</div>
+                                                <div class="comment-parent"
+                                                     v-if="item.username !== undefined">
+                                                    <div>
+                                                        <span>{{item.username}}：</span>
+                                                        <span v-if="item.state === 1">{{item.parentContent}}</span>
+                                                        <span style="text-decoration: line-through;"
+                                                              v-else>该评论已经删除</span>
+                                                    </div>
+                                                </div>
+                                                <div><span>来自：</span>
+                                                    <template v-if="item.title != null">
+                                                        <a :href="item.articleUrl">{{item.title}}</a>
+                                                    </template>
+                                                    <template v-else>
+                                                        <span style="text-decoration: line-through;">
+                                                            该文章已被删除
+                                                        </span>
+                                                    </template>
+                                                </div>
+
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <el-pagination
+                                                        small
+                                                        @current-change="userCommentHandlePageNum"
+                                                        :current-page="userCommentPageNum"
+                                                        :page-size="userCommentPageSize"
+                                                        layout="prev, pager, next"
+                                                        :total="userCommentTotal"
+                                                        :hide-on-single-page="true">
+                                                </el-pagination>
+                                            </div>
+                                        </el-tab-pane>
+                                        <el-tab-pane label="回复我的" name="second">
+                                            <div class="order">
+                                                <div class="pull-right">
+                                                    <a class="" @click="getUserReply('asc')"
+                                                       v-bind:class="{active : 'asc' === userReplyOrderBy}">按时间正序</a>
+                                                    <a class="" @click="getUserReply('desc')"
+                                                       v-bind:class="{active : 'desc' === userReplyOrderBy}">按时间倒序</a>
+                                                </div>
+                                            </div>
+                                            <div v-if="userReply.length === 0" class="no-data">
+                                                暂无内容
+                                            </div>
+                                            <div class="comment-card" v-for="item in userReply">
+                                                <div class="comment-top">
+                                                    <div class="comment-top-left">
+                                                        <span>{{item.username}}</span>
+                                                        <span>回复：</span>
+                                                    </div>
+                                                    <div class="comment-top-right">{{item.createTime
+                                                        | commentDateFormat}}
+                                                    </div>
+                                                </div>
+                                                <div class="comment-content">{{item.content}}</div>
+                                                <div class="comment-parent"
+                                                     v-if="item.username !== undefined">
+                                                    <div>
+                                                        <span>{{user.username}}：</span>
+                                                        <span v-if="item.state === 1">{{item.parentContent}}</span>
+                                                        <span style="text-decoration: line-through;"
+                                                              v-else>该评论已经删除</span>
+                                                    </div>
+                                                </div>
+                                                <div><span>来自：</span><a :href="item.articleUrl">{{item.title}}</a>
+                                                </div>
+
+                                            </div>
+                                            <div style="text-align: right;">
+                                                <el-pagination
+                                                        small
+                                                        @current-change="userCommentHandlePageNum"
+                                                        :current-page="userReplyPageNum"
+                                                        :page-size="userReplyPageSize"
+                                                        layout="prev, pager, next"
+                                                        :total="userReplyTotal"
+                                                        :hide-on-single-page="true">
+                                                </el-pagination>
+                                            </div>
+                                        </el-tab-pane>
+                                    </el-tabs>
+                                </template>
+                                <template v-if="sidebarActive === 'user'">
+                                    <el-tabs v-model="userActiveName">
+                                        <el-tab-pane label="绑定账号" name="first">
+                                            <ul class="binding">
+
+                                                <li v-if="bindList.phone !== false">
+                                                    <img src="/img/phone_blue.svg">
+                                                    <div>
+                                                        <p>手机</p>
+                                                        <p>{{bindList.phone}}</p>
+                                                    </div>
+                                                    <a @click="unBinding('phone')" href="javascript:;">已绑定</a>
+                                                </li>
+                                                <li v-else="">
+                                                    <img src="/img/phone_gray.svg">
+                                                    <div>
+                                                        <p>手机</p>
+
+                                                    </div>
+                                                    <div class="tips">
+                                                        <p>可用手机号加密码登录</p>
+                                                    </div>
+                                                    <a><i class="fa fa-plus"></i>绑定</a>
+                                                </li>
+
+                                                <li v-if="bindList.email !== false">
+                                                    <img src="/img/email_pink.svg">
+                                                    <div>
+                                                        <p>邮箱</p>
+                                                        <p>{{bindList.email}}</p>
+                                                    </div>
+                                                    <a @click="unBinding('email')" href="javascript:;">已绑定</a>
+                                                </li>
+
+                                                <li v-else>
+                                                    <img src="/img/email_gray.svg">
+                                                    <div>
+                                                        <p>邮箱</p>
+                                                    </div>
+                                                    <div class="tips">
+                                                        <p>可用邮箱加密码登录，</p>
+                                                        <p>及时接收评论回复信息</p>
+                                                    </div>
+                                                    <a href="javascript:;" @click="emailVisible = true">
+                                                        <i class="fa fa-plus"></i>绑定
+                                                    </a>
+                                                </li>
+                                                <li v-if="bindList.weibo !== false">
+                                                    <img src="/img/weibo_red.svg">
+                                                    <div>
+                                                        <p>微博</p>
+                                                    </div>
+                                                    <a @click="unBinding('weibo')" href="javascript:;">已绑定</a>
+                                                </li>
+                                                <li v-else>
+                                                    <img src="/img/weibo_gray.svg">
+                                                    <div>
+                                                        <p>微博</p>
+                                                    </div>
+                                                    <a><i class="fa fa-plus"></i>绑定</a>
+                                                </li>
+                                                <li v-if="bindList.github !== false">
+                                                    <img src="/img/github_black.svg">
+                                                    <div>
+                                                        <p>github</p>
+                                                    </div>
+                                                    <a @click="unBinding('github')" href="javascript:;">已绑定</a>
+                                                </li>
+                                                <li v-else="">
+                                                    <img src="/img/github_gray.svg" alt="">
+                                                    <div>
+                                                        <p>github</p>
+                                                    </div>
+
+                                                    <a @click="bingGithub()" href="javascript:;">
+                                                        <i class="fa fa-plus"></i>绑定
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </el-tab-pane>
+                                    </el-tabs>
+                                </template>
+                                <template v-if="sidebarActive === 'userSetting'">
+                                    <el-tabs v-model="userSettingActiveName" >
+                                        <el-tab-pane label="个人信息" name="first" >
+                                            <div class="user-setting-left">
+                                                    <div class="user-setting-li">
+                                                        <span>名称：</span>
+                                                        <el-input :disabled="true" v-model="userNew.username"></el-input>
+                                                    </div>
+                                                    <div class="user-setting-li">
+                                                        <span class="introduction">介绍：</span>
+                                                        <el-input type="textarea"
+                                                                  :rows="3"
+                                                                  placeholder="这个用户很懒，什么也没留下..."
+                                                                  v-model="userNew.intro"></el-input>
+                                                    </div>
+                                                    <div class="user-setting-li">
+                                                        <span>性别：</span>
+                                                        <el-radio v-model="userNew.sex" label="male">男</el-radio>
+                                                        <el-radio v-model="userNew.sex" label="female">女</el-radio>
+                                                    </div>
+                                                    <div class="user-setting-li">
+                                                        <span>地区：</span>
+                                                            <div style="position: relative;display: inline-block;min-width: 50%;">
+                                                                <input class="form-control" readonly type="text"
+                                                                       :value="userNew.city"
+                                                                       data-toggle="city-picker"
+                                                                style="width: 84%;">
+                                                            </div>
+                                                    </div>
+                                                <el-button size="small" type="primary" @click="submitUserSetting">保存</el-button>
+                                                </div>
+                                            <div class="user-setting-right">
+                                                    <el-avatar :size="136"
+                                                               :src="user.avatarImg"
+                                                               style="margin-bottom: 20px;"
+                                                    >
+                                                    </el-avatar>
+                                                    <el-upload
+                                                            action="/u/setAvatar"
+                                                            :show-file-list="false"
+                                                            :on-success="showImg">
+                                                        <el-button size="small" type="primary">修改头像</el-button>
+                                                    </el-upload>
+                                                </div>
+
+
+                                        </el-tab-pane>
+                                        <el-tab-pane label="隐私设置" name="second">
+                                        </el-tab-pane>
+                                    </el-tabs>
+                                </template>
+                            </el-col>
+                        </el-row>
+                    </div>
+                </el-col>
+            </el-row>
+
+            <el-dialog title="绑定邮箱" :visible.sync="emailVisible" width="26%">
+                <div class="dialog-lay">
+                    <span class="dialog-label">邮箱</span>
+                    <el-input class="dialog-input" v-model="emailInput" placeholder="请输入邮箱"
+                              @blur="checkEmail()"></el-input>
+                </div>
+                <p class="error-msg">{{errorEmailMsg}}</p>
+                <div class="dialog-lay">
+                    <span class="dialog-label">验证码</span>
+                    <el-input class="dialog-input" v-model="emailCode" :disabled="emailCodeInputDisable"
+                              placeholder="请输入验证码"></el-input>
+                    <el-button type="primary" :disabled="emailCodeDisable" @click="getEmailCode()">{{emailCodeBtnMsg}}
+                    </el-button>
+                </div>
+                <p class="error-msg">{{errorEmailCodeMsg}}</p>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="mailCancel()">取 消</el-button>
+                    <el-button @click="mailEnter()" type="primary">绑定</el-button>
+                </div>
+            </el-dialog>
+        </div>
+    </div>
+
+
+    <footer th:include="common/footer :: copyright"></footer>
+</div>
+
+
+<div th:replace="common/foot :: foot"></div>
+<script th:src="@{../lib/city-picker/city-picker.data.js}"></script>
+<script th:src="@{../lib/city-picker/city-picker.js}"></script>
+<script th:src="@{../js/user.js}"></script>
+
+</body>
+</html>

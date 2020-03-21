@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head(title,links,styles)">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="robots" content="index,follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="Areo,博客,技术,编程">
+    <meta name="author" content="Areo"/>
+    <meta name="description" content="Wiblog | Areo的个人网站 - 作者:Areo"/>
+
+    <title th:replace="${title}">wiblog - Areo的个人网站</title>
+
+    <!--动画-->
+    <link href="/lib/animate.min.css" rel="stylesheet">
+    <!--字体-->
+    <link href="/lib/font-awesome/css/font-awesome.min.css" rel="stylesheet">
+    <!--bootstrap-->
+<!--    <link href="https://cdn.bootcss.com/twitter-bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">-->
+    <!--element-ui-->
+    <link href="/lib/element-ui/index.css" rel="stylesheet">
+    <link href="/css/all.css" rel="stylesheet" >
+    <link href="/admin/css/admin-common.css" rel="stylesheet">
+    <base th:href="${#request.getContextPath()}+'/'">
+
+    <th:block th:replace="${links}" />
+    <th:block th:replace="${styles}" />
+</head>

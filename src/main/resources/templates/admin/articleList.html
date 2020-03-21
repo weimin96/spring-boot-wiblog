@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/common/head :: head(~{::title},~{},~{})">
+    <title>wiblog - Areo的个人网站</title>
+</head>
+
+<body>
+<div id="app">
+    <div class="manage-title">
+        <h2>文章管理</h2>
+    </div>
+    <div class="manage-main">
+
+        <el-row>
+            <el-col :span="24">
+                <template>
+                    <el-table :data="tableData" style="width: 100%" stripe>
+                        <el-table-column prop="title" label="标题"></el-table-column>
+                        <el-table-column label="分类" width="120">
+                            <template slot-scope="scope">
+                                <el-tag effect="dark" type="warning" @click="gotoCategoryPage(scope.row.categoryUrl)">
+                                    {{ scope.row.categoryName }}
+                                </el-tag>
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="tags" label="标签" width="200"></el-table-column>
+                        <el-table-column prop="info" label="统计" width="150" :formatter="formatterInfo"></el-table-column>
+                        <el-table-column label="状态" width="260">
+                            <template slot-scope="scope">
+                                公开
+                                <el-switch
+                                        v-model="scope.row.privately"
+                                        active-color="#ff4949"
+                                        inactive-color="#13ce66"
+                                        :active-value=true
+                                        :inactive-value=false
+                                        disabled>
+                                </el-switch>
+                                赞赏
+                                <el-switch
+                                        v-model="scope.row.reward"
+                                        active-color="#ff4949"
+                                        inactive-color="#13ce66"
+                                        :active-value=false
+                                        :inactive-value=true
+                                        disabled>
+                                </el-switch>
+                                评论
+                                <el-switch
+                                        v-model="scope.row.comment"
+                                        active-color="#ff4949"
+                                        inactive-color="#13ce66"
+                                        :active-value=false
+                                        :inactive-value=true
+                                        disabled>
+                                </el-switch>
+
+                            </template>
+
+                        </el-table-column>
+                        <el-table-column prop="createTime" label="发布时间" width="120" :formatter="formatterDate"></el-table-column>
+                        <el-table-column label="操作" width="220" align="right">
+                            <template slot="header" slot-scope="scope">
+                                <el-input v-model="searchKey" size="mini" placeholder="搜索标题..."></el-input>
+                            </template>
+                            <template slot-scope="scope">
+                                <el-button size="mini" type="primary" plain @click="handleView(scope.$index, scope.row)">查看</el-button>
+                                <el-button size="mini" type="success" plain @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                                <el-button size="mini" type="danger" plain @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                            </template>
+                        </el-table-column>
+
+                    </el-table>
+                </template>
+                <template>
+                    <div class="block" style="float: right;">
+                        <el-pagination
+                                @current-change="handlePageNum"
+                                :current-page="pageNum"
+                                :page-size="pageSize"
+                                layout="total, prev, pager, next, jumper"
+                                :total="total"
+                                :hide-on-single-page="true">
+                        </el-pagination>
+                    </div>
+                </template>
+            </el-col>
+        </el-row>
+
+
+    </div>
+</div>
+
+<div th:replace="admin/common/foot :: adminfoot"></div>
+<script src="/admin/js/article.js"></script>
+</body>
+</html>

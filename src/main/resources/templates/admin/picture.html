@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head th:replace="admin/common/head :: head(~{::title},~{::link},~{})">
+    <title>wiblog - Areo的个人网站</title>
+
+    <link rel="stylesheet" th:href="@{/admin/css/picture.css}">
+</head>
+
+<body>
+<div id="app">
+    <div class="manage-title">
+        <h2>图片管理</h2>
+    </div>
+    <div class="manage-main ">
+        <el-upload
+                class="upload-demo"
+                action="uploadImage"
+                :on-success="uploadSuccess">
+            <el-button type="primary" style="margin-bottom: 10px">上传图片<i
+                    class="el-icon-upload el-icon--right"></i></el-button>
+        </el-upload>
+
+
+        <div class="infinite-list">
+            <el-row :gutter="20">
+                <el-col class="infinite-list-item">
+                    <template v-for="(record,index) in records">
+                        <div style="font-size: 16px;font-weight: 500;"
+                             v-if="index === 0 || records[index-1].createTime !== record.createTime">
+                            {{record.createTime | dateFormatter}}
+                        </div>
+
+                        <!--<el-image :src="record.url" fit="cover" style="height: 145px;width: 240px"
+                                  :id="record.id" :preview-src-list="[record.url]">
+                            <div slot="placeholder" class="image-slot">
+                                加载中<span class="dot">...</span>
+                            </div>
+                        </el-image>-->
+                        <div style="height: 145px;width: 240px;display: inline-block;position: relative;"
+                             @mouseover="mouseEnter(index)"
+                             @mouseout="mouseLeave">
+
+
+                            <img :src="record.url" width="100%" :id="record.id"/>
+                            <span class="picture-button-group"
+
+                                  :class="{active:index===isActive}">
+                                <span @click="showImg(record.url)">
+                                    <i class="el-icon-zoom-in"></i>
+                                </span>
+                                <span @click="delImg(record.id)">
+                                    <i class="el-icon-delete"></i>
+                                </span>
+                            </span>
+                        </div>
+                    </template>
+                </el-col>
+            </el-row>
+        </div>
+
+        <el-dialog
+                :visible.sync="imgVisible"
+                width="60%"
+                :show-close="false">
+            <img :src="imgUrl" width="100%" height="100%"/>
+            <div style="margin: 15px;padding-bottom: 15px;">
+                <el-input v-model="imgUrl" id="input">
+                    <el-button slot="append" @click="copyImgUrl()" style="cursor: pointer;">复制链接</el-button>
+                </el-input>
+            </div>
+        </el-dialog>
+    </div>
+</div>
+
+<div th:replace="admin/common/foot :: adminfoot"></div>
+<script src="/admin/js/picture.js"></script>
+</body>
+</html>

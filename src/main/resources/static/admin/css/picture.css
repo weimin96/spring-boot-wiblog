@@ -1,0 +1,28 @@
+.picture-button-group{
+    position: absolute;
+    left: 0;
+    display: none;
+    background: rgba(0,0,0,.2);
+    color: #ebeef5;
+    padding: 54px;
+    height: 135px;
+    width: 240px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.picture-button-group span:first-child{
+    padding-right: 5px;
+}
+
+.active{
+    display: inline-block!important;
+}
+
+.el-dialog__header{
+    /*padding: 0;*/
+}
+
+.el-dialog__body{
+    /*padding: 0;*/
+}

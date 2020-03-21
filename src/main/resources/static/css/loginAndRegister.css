@@ -1,0 +1,180 @@
+body{
+    background: url(/img/login.jpg) no-repeat left;
+    background-size: cover;
+    min-width: 1200px;
+}
+
+.login-label{
+    width: 400px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 2px;
+    margin: 110px auto;
+}
+
+.register-label{
+    width: 444px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 2px;
+    margin: 44px auto;
+}
+
+.login-top{
+    padding: 30px 40px 20px;
+}
+
+.login-title-label{
+    position: relative;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-title{
+    font-weight: 700;
+    left: 50%;
+    width: 200px;
+    margin-left: -100px;
+    top: 0;
+    position: absolute;
+    z-index: 2;
+    font-size: 18px;
+    color: #333;
+    background: #fff;
+    text-align: center;
+}
+
+.login-title span{
+    color: #1890ff;
+    margin-left: 5px;
+}
+
+.login-title-label:after{
+    display: inline-block;
+    content: "";
+    width: 100%;
+    height: 1px;
+    background: #f0f0f0;
+}
+
+.login-form,.register-form{
+    box-sizing: border-box;
+    margin: 0;
+    list-style: none;
+    font-feature-settings: "tnum";
+    font-variant: tabular-nums;
+    line-height: 1.5;
+    color: rgba(0,0,0,.65);
+    font-size: 14px;
+    padding: 0 0 30px;
+}
+
+.login-form .first-input{
+    margin-bottom: 25px;
+}
+
+.login-form input,.register-form input{
+    background: #ebeef5;
+}
+
+.login-form button{
+    width: 100%;
+}
+
+
+/*错误提示*/
+.error-msg{
+    color: #a94442;
+    font-size: 11px;
+    padding-top: 5px;
+    padding-left: 14px;
+    height: 25px;
+}
+
+/*已有账号*/
+.hasAccount{
+    font-size: 12px;
+    float: right;
+    padding: 10px 0;
+}
+
+.hasAccount a{
+    color: #1890ff;
+}
+
+.h-content{
+    margin-top: 0;
+    margin-bottom: 1em;
+}
+
+.login-bottom{
+    border-top: 1px solid #f0f0f0;
+    color: #999;
+    margin: 0 40px;
+    padding: 20px 0;
+    font-size: 12px;
+}
+
+.login-else{
+    display: flex;
+    -webkit-justify-content: space-around;
+    -ms-flex-pack: distribute;
+    justify-content: space-around;
+}
+
+.login-else img{
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+}
+
+/*正确错误图片*/
+.green{
+    color: #54a054;
+}
+
+.red{
+    color: #a94442;
+}
+
+.register-form .start{
+    float: left;
+    width: 0;
+    margin-top: 10px;
+    color: #ad1313;
+}
+
+.register-input,.register-btn button{
+    width: 88%;
+}
+
+.error-tag{
+    float: right;
+}
+
+.error-msg,.register-btn button,.register-input{
+    margin-left: 20px;
+}
+
+.register-account{
+    padding-right: 25px;
+}
+
+.code-input{
+    width: 56%;
+}
+
+.code-button{
+    width: 112px;
+}
+
+.img-code{
+    width: 112px;
+    height: 38px;
+    vertical-align: middle;
+}
+
+
+
+
+

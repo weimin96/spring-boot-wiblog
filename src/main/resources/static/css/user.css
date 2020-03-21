@@ -1,0 +1,366 @@
+.user-header{
+    width: 100%;
+    padding: 30px 0;
+    color: #fff;
+    height: 155px;
+    background-image: url("/img/banner.png");
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+/*头像*/
+.user-header .user-pic{
+    float: left;
+    margin-right: 20px;
+}
+
+.user-header .user-info{
+    float: right;
+    width: 95%;
+}
+
+.user-header .user-data{
+    float: left;
+    margin-top: 20px;
+}
+
+/*用户名*/
+.user-header .name{
+    font-size: 27px;
+    font-weight: 600;
+}
+
+.user-header .information{
+    display: inline;
+}
+
+.user-header .information span{
+    padding-right: 10px;
+}
+
+/*更多信息*/
+.user-header .more-info{
+    display: inline;
+    border-left: 2px solid rgba(255,255,255,.4);
+    padding-left: 16px;
+    color: rgba(255,255,255,.6);
+    font-size: 12px;
+}
+
+.user-header .more-info a{
+    color: rgba(255,255,255,.6);
+    padding-left: 5px;
+    cursor: pointer;
+}
+
+/*统计*/
+.user-header .user-statistic{
+    float: right;
+    width: 40%;
+    margin-top: 20px;
+}
+
+.user-header .user-statistic .item{
+    float: left;
+    margin-right: 30px;
+    text-align: center;
+}
+
+.user-statistic .item span{
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.user-statistic .item div{
+    font-size: 14px;
+}
+
+.user-statistic .user-setting{
+    border: 1px solid #c0c4cc;
+    padding: 5px 20px;
+    border-radius: 22px;
+    margin: 12px;
+}
+
+.user-statistic .user-setting a{
+    color: #FFF;
+    cursor: pointer;
+}
+
+/*内容*/
+.user-content{
+    width: 95%;
+    height: 500px;
+    padding: 0 15px;
+}
+
+
+/*评论*/
+.order{
+    width: 100%;
+    display: inline-block;
+}
+
+.order a{
+    color:#969696;
+    font-size: 12px;
+    font-weight: 400;
+    margin: 0 5px;
+    cursor: default;
+}
+
+.order .active{
+    color:#2f2f2f;
+}
+.comment-card{
+    border-radius: 5px;
+    padding: 10px;
+    background: #fff;
+    margin-bottom: 5px;
+}
+
+
+
+.comment-card .comment-top{
+    display: inline-block;
+    width: 100%;
+    color: #333;
+}
+
+.comment-card .comment-top-left{
+    float: left;
+    font-weight: 600;
+}
+
+.comment-card .comment-top-left span:first-child{
+
+}
+
+.comment-card .comment-top-left span:last-child{
+    margin-left: 5px;
+}
+
+.comment-card .comment-top-right{
+     float: right;
+     color: #909399;
+ }
+
+.comment-card .comment-content{
+    color: #333;
+    overflow: hidden;
+    -webkit-line-clamp: 4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    margin-bottom: 10px;
+    cursor: default;
+}
+
+.comment-card .comment-content:hover{
+    color: #409eff;
+}
+
+.comment-card .comment-parent{
+    background: #eee;
+    padding: 5px;
+    margin: 5px 0;
+    overflow: hidden;
+    -webkit-line-clamp: 4;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    cursor: default;
+}
+
+.comment-card .comment-parent:hover{
+    color: #409eff;
+}
+
+/*侧边栏*/
+.sidebar{
+
+}
+
+.sidebar ul{
+    list-style:none;
+    padding-inline-start: 0;
+}
+
+.sidebar li:first-child{
+    margin-top: 40px;
+}
+
+.sidebar .sidebarActive{
+    color: #fff;
+    background: rgba(240,20,20,.8);
+    border-radius: 8px 0 0 8px;
+}
+
+.sidebar .sidebarActive:after{
+    display: block;
+    content: "";
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 0;
+    height: 0;
+    border-top: 24px solid #f5f5f5;
+    border-bottom: 24px solid #f5f5f5;
+    border-left: 15px solid transparent;
+}
+
+.sidebar li{
+    height: 48px;
+    margin: 0 auto 8px;
+    position: relative;
+    display: block;
+    font-size: 16px;
+    line-height: 48px;
+    text-align: center;
+    color: #787d82;
+    cursor: default;
+}
+
+.sidebar li i{
+    padding-right: 10px;
+}
+
+/*用户绑定*/
+.binding{
+    list-style: none;
+}
+
+.binding li{
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    height: 64px;
+}
+
+.binding li img{
+    float: left;
+    width: 47px;
+}
+
+.binding li div{
+    float: left;
+}
+
+.binding p{
+    margin: 0 0 0 10px;
+}
+
+.binding .tips p{
+    margin-left: 260px;
+    color: #909399;
+}
+
+.binding a{
+    float: right;
+    background: #fff;
+    padding: 4px 10px;
+    border-radius: 5px;
+    box-shadow: 0 1px 1px 0 rgba(0,0,0,.2);
+    cursor: default;
+    border: 1px solid #ccc;
+    color: #333;
+    font-size: 13px;
+}
+
+.binding a:hover{
+    background: #f8f1f1;
+}
+
+.binding a i{
+    padding-right: 10px;
+    color: #f14141;
+}
+
+/*对话框*/
+.dialog-lay .dialog-label{
+    width: 44px;
+    display: inline-block;
+}
+
+.dialog-input{
+    width: 170px;
+    margin: 0 10px;
+    padding-top: 5px;
+}
+
+.dialog-lay span{
+    width: 70px;
+    display: inline-block;
+}
+
+.error-msg{
+    color: #ef1212;
+    margin: 0 0 0 60px;
+    font-size: 13px;
+    height: 20px;
+}
+
+.el-tabs__content{
+    background: #fff;
+}
+
+/*个人信息*/
+.user-setting-left{
+    width: 60%;
+    float: left;
+}
+
+.user-setting-right{
+    float: right;
+    width: 40%;
+    text-align: center;
+}
+
+.user-setting-li{
+    margin-bottom: 15px;
+}
+
+.user-setting-li span{
+    margin-right: 5px;
+}
+
+.user-setting-li .introduction{
+    vertical-align: top;
+}
+
+.setting-avatar{
+    text-align: center;
+}
+
+.setting-avatar .el-button{
+    padding: 8px 16px;
+}
+
+.user-setting-li .el-input,.user-setting-li .el-textarea{
+    width: 75%;
+}
+
+/*无内容*/
+.no-data{
+    text-align: center;
+    margin: 50px;
+    color: #c0c4cc;
+}
+
+.el-tabs__content{
+    padding: 10px;
+    box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    overflow: inherit;
+    position: absolute;
+    width: 65.3%;
+}
+
+/*文本*/
+.user-setting-li span,.binding p{
+    font-weight: 500;
+}
+
+#intro{
+    font-size: 13px;
+    color: #ccc;
+    margin-top: 10px;
+    display: none;
+}

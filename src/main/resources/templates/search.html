@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml" xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head th:replace="common/head :: head(~{::title},~{::link},~{})">
+
+    <title>wiblog - Areo的个人网站</title>
+
+    <link rel="stylesheet" th:href="@{/css/search.css}">
+</head>
+<body>
+
+<div id="index-wrapper">
+    <div id="index-page">
+        <!--header-->
+        <div th:include="common/header :: header"></div>
+
+        <div id="app">
+            <el-row :gutter="20">
+                <el-col :span="12" :offset="6">
+
+                    <div style="margin: 50px 0;">
+                        <el-input @keyup.enter.native="search()" placeholder="搜索文章" v-model="searchVal">
+                            <el-button slot="append" icon="el-icon-search" @click="search()"></el-button>
+                        </el-input>
+                    </div>
+
+                    <div class="tools">
+                        <span>时间不限</span>
+                        <span>按时间倒序</span>
+                        <span>按时间正序</span>
+
+                    </div>
+                    <div class="main">
+                        <template v-for="item in contentList" >
+                            <div class="card">
+
+                                <div class="title"><a :href="item.url"><span v-html="item.title"></span></a></div>
+                                <div class="abstract">
+                                    <span>{{item.createTime | articleDateFormat}} - </span>
+                                    <span v-html="item.content"></span>
+
+                                    <div class="category">
+                                        <el-tag class="category-tag">{{category[item.categoryId]}}</el-tag>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-if="contentList.length===0">
+                            无
+                        </template>
+                    </div>
+
+                </el-col>
+            </el-row>
+        </div>
+
+    </div>
+
+
+    <footer th:include="common/footer :: copyright"></footer>
+</div>
+
+
+<div th:replace="common/foot :: foot"></div>
+<script th:src="@{../js/search.js}"></script>
+</body>
+</html>

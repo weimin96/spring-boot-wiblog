@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiblog.core.mapper.CommentMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiblog.core.entity.Comment">
+            <id column="id" property="id"/>
+            <result column="uid" property="uid"/>
+            <result column="article_id" property="articleId"/>
+            <result column="gen_id" property="genId"/>
+            <result column="parent_id" property="parentId"/>
+            <result column="likes" property="likes"/>
+            <result column="floor" property="floor"/>
+            <result column="content" property="content"/>
+            <result column="state" property="state"/>
+            <result column="create_time" property="createTime"/>
+            <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+id, uid, article_id, parent_id,gen_id,floor, likes, content, state,create_time, update_time
+    </sql>
+    
+    <select id="selectCommentPage" resultType="com.wiblog.core.vo.CommentVo">
+        select c.*,u.username,u.avatar_img as avatarImg from comment as c
+        join user as u on u.uid = c.uid
+        where c.article_id = #{articleId} and c.gen_id = 0
+    </select>
+
+    <!--不设数量限制-->
+    <select id="selectSubCommentLimit" resultType="com.wiblog.core.vo.SubCommentVo">
+        select c1.*,
+        u1.username as replyName,u1.avatar_img as replyAvatarImg,
+        u2.uid as replyedId,u2.username as replyedName,u2.avatar_img as replyedAvatarImg
+        from comment as c1
+        join user as u1 on u1.uid = c1.uid and c1.gen_id = #{commentId}
+        join comment as c2 on c2.id = c1.parent_id
+        join user as u2 on u2.uid = c2.uid
+        <choose>
+            <when test="orderBy == 'asc'">
+                ORDER BY c1.create_time asc
+            </when>
+            <otherwise>
+                ORDER BY c1.create_time desc
+            </otherwise>
+        </choose>
+
+    </select>
+    
+    <select id="selectCommentManagePage" resultType="com.wiblog.core.vo.CommentManageVo">
+        select a.title,u.username,c.id,c.likes,c.content,c.state,c.article_id,c.create_time,count(c1.id) as reply_num from comment as c
+        left join user as u on c.uid = u.uid
+        left join article as a on c.article_id = a.id
+        left join comment as c1 on c1.parent_id = c.id
+        <where>
+            <if test="articleId != null and articleId != '' ">
+                and c.article_id = #{articleId}
+            </if>
+            <if test="state != null">
+                and c.state = #{state}
+            </if>
+            <if test="username != null and username != ''">
+                and u.username like concat('%',#{username},'%')
+            </if>
+            <if test="title != null and title != ''">
+                and a.title like concat('%',#{title},'%')
+            </if>
+        </where>
+        group by c.id
+    </select>
+
+    <update id="updateStateById">
+        update comment set state = 0 where id = #{id}
+    </update>
+
+    <update id="restoreStateById">
+        update comment set state = 1 where id = #{id}
+    </update>
+
+    <select id="selectCommentByUid" resultType="com.wiblog.core.vo.UserCommentVo">
+        select c1.id,c1.content,c1.create_time,c1.likes,
+        c2.content as parent_content,c2.state,
+        u2.username,
+        a.article_url,a.title from `comment` as c1
+        left join `comment` as c2 on c1.parent_id = c2.id
+        left join article as a on c1.article_id = a.id
+        left join `user` as u2 on c2.uid = u2.uid
+        where c1.uid = #{uid} and c1.state = 1
+    </select>
+
+    <select id="selectUserReplyByUid" resultType="com.wiblog.core.vo.UserCommentVo">
+        select c1.id,c1.content,c1.create_time,c1.likes,
+        c2.content as parent_content,c2.state,
+        u1.username,
+        a.article_url,a.title from `comment` as c1
+        left join `comment` as c2 on c1.parent_id = c2.id
+        left join article as a on c1.article_id = a.id
+        left join `user` as u1 on c1.uid = u1.uid
+        where c2.uid = #{uid} and c1.state = 1
+    </select>
+
+    <update id="updateUid">
+        update comment
+        set uid = #{newUid}
+        where uid = #{oldUid}
+    </update>
+
+</mapper>

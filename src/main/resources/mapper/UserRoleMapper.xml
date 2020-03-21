@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wiblog.core.mapper.UserRoleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.wiblog.core.entity.UserRole">
+        <result column="id" property="id"/>
+            <result column="uid" property="uid"/>
+            <result column="role_id" property="roleId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+    id,uid, role_id
+    </sql>
+
+    <select id="selectRoleByUid" resultType="com.wiblog.core.vo.RoleVo">
+        select role_id,name from role
+        join user_role ur on role.id = ur.Role_id
+        where ur.uid = #{uid}
+    </select>
+
+    <select id="selectRole" resultType="com.wiblog.core.vo.RoleVo">
+        select id as roleId,name from role;
+    </select>
+    
+    <insert id="insertOrUpdate" parameterType="com.wiblog.core.vo.RoleVo">
+        insert into user_role (uid,role_id)
+        values(#{uid},#{roleId})
+        ON DUPLICATE KEY UPDATE
+        role_id = #{roleId},
+        uid = #{uid}
+    </insert>
+</mapper>

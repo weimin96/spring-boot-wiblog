@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
+      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<head th:replace="common/head :: head(~{::title},~{::link},~{})">
+    <title>wiblog - Areo的个人网站</title>
+    <link rel="stylesheet" th:href="@{css/index.css}">
+
+</head>
+
+<body>
+
+<div id="index-wrapper">
+    <div id="index-page">
+        <!--header-->
+        <div th:include="common/header :: header"></div>
+
+        <!--body-->
+        <div id="post-list">
+            <el-row :gutter="20">
+                <el-col :span="14" :offset="3">
+                    <template v-for="item in articleList">
+                        <article class="post-card">
+                            <div class="post-list-pic">
+                                <a :href="item.articleUrl"><img :src="item.imgUrl" alt=""></a>
+                            </div>
+                            <div class="post-list-inner">
+                                <header class="post-list-inner-header">
+                                    <a class="label" :href="'/category/'+item.categoryUrl">{{item.categoryName}}
+                                        <i class="label-arrow"></i>
+                                    </a>
+                                    <h2 class="post-list-inner-title">
+                                        <a :href="item.articleUrl">{{item.title}}</a>
+                                    </h2>
+                                </header>
+                                <div class="post-list-inner-content">
+                                    <p>{{item.articleSummary}}</p>
+                                </div>
+                            </div>
+                            <div class="post-list-meta">
+                                        <span class="visible-lg visible-md visible-sm pull-left">
+                                            <a :href="item.articleUrl"><i class="fa fa-calendar"></i>{{item.createTime | dateFormat}}</a>
+                                            <a :href="item.articleUrl+'#respond'"><i class="fa fa-commenting-o"></i>{{item.commentsCounts}} 条评论</a>
+                                        </span>
+                                <span class="pull-left">
+                                            <a :href="item.articleUrl"><i class="fa fa-eye"></i>{{item.hits}} 次阅读</a>
+                                            <a :href="item.articleUrl"><i class="fa fa-thumbs-o-up"></i>{{item.likes}} 人点赞</a>
+                                        </span>
+                                <span class="pull-right">
+                                            <a class="read-more" :href="item.articleUrl" title="阅读全文">阅读全文+
+                                                <i class="fa fa-chevron-circle-right"></i></a>
+                                        </span>
+                            </div>
+                        </article>
+                    </template>
+                    <!--分页-->
+                    <div class="text-center" id="page-footer">
+                        <div id="pagination">
+                        </div>
+                    </div>
+                </el-col>
+                <el-col :span="4">
+                    <template>
+                        <popular-article></popular-article>
+                    </template>
+
+                </el-col>
+                <el-col :span="4">
+                    <template>
+                        <div class="card">
+                            <div class="sibar-title">
+                                <span>发现</span><span>附近的人</span>
+                                <div class="location" @click="getGeoLocation()" v-if="nearUserList.length === 0">
+                                    <i class="fa fa-bullseye"></i>
+                                    <span class="main-color">开启定位</span>
+                                </div>
+                                <div v-for="item in  nearUserList" style="margin-top: 5px">
+                                    <div @click="gotoUser(item.uid)" class="near-user-li">
+                                        <el-avatar :size="30" :src="item.avatar"></el-avatar>
+
+                                        <div style="display: inline-block;font-size: 12px;margin-left: 5px;">
+                                            <div style="">
+                                                <span style="font-weight: bold;">{{item.name}}</span>
+                                                <span v-if="item.sex === 'male'" class="el-icon-male main-color"></span>
+                                                <span v-else class="pink el-icon-female"></span>
+                                            </div>
+
+                                            <span>{{item.distance}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </el-col>
+            </el-row>
+
+        </div>
+
+        <footer th:include="common/footer :: copyright"></footer>
+    </div>
+</div>
+<div th:replace="common/foot :: foot"></div>
+<script th:src="@{lib/jq_paging.js}"></script>
+<script th:src="@{components/popularArticle.js}"></script>
+<script th:src="@{js/index.js}"></script>
+</body>
+</html>
