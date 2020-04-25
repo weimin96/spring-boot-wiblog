@@ -133,6 +133,8 @@ CREATE TABLE `article`
   AUTO_INCREMENT = 20
   DEFAULT CHARSET = utf8;
 
+CREATE INDEX time ON article(state,privately,create_time);
+
 -- ----------------------------
 -- 评论
 -- ----------------------------

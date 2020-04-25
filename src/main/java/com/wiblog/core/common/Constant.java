@@ -44,7 +44,7 @@ public class Constant {
     /**
      * 点击率redis key
      */
-    public static final String HIT_RECORD_KEY = "hit_record_";
+    public static final String HIT_RECORD_KEY = "hit_record";
 
     /**
      * 邮箱发送次数
@@ -72,8 +72,18 @@ public class Constant {
     public static final String ARTICLE_RANKING_KEY  = "article_ranking";
 
     /**
+     * 文章简要信息redis
+     */
+    public static final String ARTICLE_DETAIL_KEY  = "article_detail";
+
+    /**
      * 附近的人
      */
     public static final String NEAR_USER_KEY = "near_user";
+
+    /**
+     * 日志列表
+     */
+    public static final String LOG_PATH = "/home/pwm/log/";
 }
 

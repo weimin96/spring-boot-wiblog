@@ -72,6 +72,19 @@
             that = this;
         },
         created() {
+            marked.setOptions({
+                highlight: function(code) {
+                    return hljs.highlightAuto(code).value;
+                },
+                pedantic: false,
+                gfm: true,
+                tables: true,
+                breaks: false,
+                sanitize: false,
+                smartLists: true,
+                smartypants: false,
+                xhtml: false
+            });
             this.initData();
         },
         mounted() {

@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml"
       xmlns:v-bind="http://www.w3.org/1999/xhtml">
-<head th:replace="admin/common/head :: head(~{::title},~{},~{})">
+<head th:replace="admin/common/head :: head(~{::title},~{::link},~{})">
     <title>wiblog - Areo的个人网站</title>
+    <link rel="stylesheet" href="/admin/css/log.css">
 </head>
 
 <body>
@@ -11,13 +12,44 @@
         <h2>日志管理</h2>
     </div>
     <div class="manage-main">
-            <div id="log-container" style="height: 450px; overflow-y: scroll; background: #333; color: #aaa; padding: 10px;">
-                <div>
-                </div>
-            </div>
+        <el-button @click="currentData()" v-if="">实时日志</el-button>
+        <template>
+            <el-table :data="sortLog" stripe style="width: 90%">
+                <el-table-column prop="name" label="文件名">
+                </el-table-column>
+                <el-table-column label="操作" width="220">
+                    <template slot-scope="scope">
+                        <el-button size="mini" type="primary" plain @click="handleView(scope.$index, scope.row)">查看
+                        </el-button>
+                        <el-button size="mini" type="primary" plain @click="handleDel(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </template>
 
     </div>
 
+    <el-dialog :visible.sync="fileVisible"
+               width="60%"
+               :show-close="false">
+        <template>
+            <p v-for="it in logDetail">{{it}}</p>
+            <el-button @click="pageUp()">上一页</el-button>
+            <el-button @click="pageDown()">下一页</el-button>
+            <span>总数：{{total}}</span>
+        </template>
+
+    </el-dialog>
+
+    <el-dialog :visible.sync="currentVisible"
+               width="70%"
+               :show-close="false"
+                :before-close="closeCurrentData">
+        <div id="log-container"
+             style="height: 450px; overflow-y: auto; background: #fff; color: rgb(0, 0, 0); padding: 10px;">
+        </div>
+    </el-dialog>
 
 </div>
 

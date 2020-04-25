@@ -31,9 +31,12 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * 获取文章分页列表
      * @param page page
      * @param state 私密
+     * @param categoryId 文章分类
      * @return IPage
      */
-    IPage<ArticlePageVo> selectPageList(Page<Article> page,@Param(value = "state") Integer state);
+    IPage<ArticlePageVo> selectPageList(Page<Article> page,
+                                        @Param(value = "state") Integer state,
+                                        @Param(value = "categoryId") Long categoryId);
 
     /**
      * 获取文章详细信息
@@ -83,4 +86,10 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @return int
      */
     int updateLikesBatch(List<Map> likeList);
+
+    List<Map> selectHits();
+
+    List<Map> selectLikes();
+
+    List<Map> selectListForTitleAndUrl();
 }

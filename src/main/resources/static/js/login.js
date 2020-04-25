@@ -31,7 +31,13 @@ let app = new Vue({
                 password: app.password
             },function (res) {
                 if (res.code === 10000){
-                    location.href = Cookies.get('back');
+                    let url = Cookies.get('back');
+                    if(url !== undefined){
+                        location.href = url;
+                    }else{
+                        location.href = "/";
+                    }
+
                 }else{
                     app.msgError = res.msg;
                 }

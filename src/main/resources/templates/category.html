@@ -5,7 +5,7 @@
 
     <title>wiblog - Areo的个人网站</title>
 
-    <link rel="stylesheet" th:href="@{/css/category.css}">
+    <link rel="stylesheet" th:href="@{../css/index.css}">
 </head>
 <body>
 
@@ -14,15 +14,73 @@
         <!--header-->
         <div th:include="common/header :: header"></div>
 
+        <!--body-->
+        <div id="post-list">
+            <el-row :gutter="20">
+                <el-col :span="14" :offset="3">
+                    <template v-if="articleList.length === 0">
+                        <div style="font-size: 17px;color: #c0c4cc;margin-bottom: 216px;">
+                            暂无内容
+                        </div>
+                    </template>
+                    <template v-for="item in articleList">
+                        <article class="post-card">
+                            <div class="post-list-pic">
+                                <a :href="item.articleUrl"><img :src="item.imgUrl" alt=""></a>
+                            </div>
+                            <div class="post-list-inner">
+                                <header class="post-list-inner-header">
+                                    <a class="label" :href="'/category/'+item.categoryUrl">{{item.categoryName}}
+                                        <i class="label-arrow"></i>
+                                    </a>
+                                    <h2 class="post-list-inner-title">
+                                        <a :href="item.articleUrl">{{item.title}}</a>
+                                    </h2>
+                                </header>
+                                <div class="post-list-inner-content">
+                                    <p>{{item.articleSummary}}</p>
+                                </div>
+                            </div>
+                            <div class="post-list-meta">
+                                        <span class="visible-lg visible-md visible-sm pull-left">
+                                            <a :href="item.articleUrl"><i class="fa fa-calendar"></i>{{item.createTime | dateFormat}}</a>
+                                            <a :href="item.articleUrl+'#respond'"><i class="fa fa-commenting-o"></i>{{item.commentsCounts}} 条评论</a>
+                                        </span>
+                                <span class="pull-left">
+                                            <a :href="item.articleUrl"><i class="fa fa-eye"></i>{{item.hits}} 次阅读</a>
+                                            <a :href="item.articleUrl"><i class="fa fa-thumbs-o-up"></i>{{item.likes}} 人点赞</a>
+                                        </span>
+                                <span class="pull-right">
+                                            <a class="read-more" :href="item.articleUrl" title="阅读全文">阅读全文+
+                                                <i class="fa fa-chevron-circle-right"></i></a>
+                                        </span>
+                            </div>
+                        </article>
+                    </template>
+                    <!--分页-->
+                    <div class="text-center" id="page-footer" >
+                        <div id="pagination">
+                        </div>
+                    </div>
+                </el-col>
+                <el-col :span="4">
+                    <template>
+                        <popular-article></popular-article>
+                    </template>
+
+                </el-col>
+            </el-row>
+
+        </div>
+
+        <footer th:include="common/footer :: copyright"></footer>
     </div>
-
-
-
-    <footer th:include="common/footer :: copyright"></footer>
 </div>
 
 
 <div th:replace="common/foot :: foot"></div>
+<script th:src="@{../lib/jq_paging.js}"></script>
+<script th:src="@{../components/popularArticle.js}"></script>
 <script th:src="@{../js/category.js}"></script>
 </body>
 </html>

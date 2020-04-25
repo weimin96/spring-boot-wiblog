@@ -1,6 +1,8 @@
 package com.wiblog.core.entity;
 
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -12,6 +14,8 @@ import java.util.Date;
  * @date 2019-06-12
  */
 @Data
+@Accessors(chain = true)
+@RequiredArgsConstructor(staticName = "of")
 public class Article implements Serializable{
 
 	private static final long serialVersionUID = 1L;

@@ -46,4 +46,12 @@ public interface IFileService {
      * @return ServerResponse
      */
     ServerResponse getLogList();
+
+    /**
+     * 获取日志内容
+     * @param path path
+     * @param pageNum pageNum
+     * @return ServerResponse
+     */
+    ServerResponse showLog(String path,Integer pageNum);
 }

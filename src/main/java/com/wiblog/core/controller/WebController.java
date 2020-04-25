@@ -66,13 +66,15 @@ public class WebController extends BaseController {
      */
     @GetMapping("/post/{url}")
     public String article(HttpServletRequest request, @PathVariable String url) {
-        Article article = articleService.getOne(new QueryWrapper<Article>().select("privately").eq("article_url", "/post/" + url));
+        Article article = articleService.getOne(new QueryWrapper<Article>().select("privately")
+                .eq("article_url", "/post/" + url)
+                .eq("state",1));
         if (article == null) {
-            return "404";
+            return "/error/404";
         }
         User user = getLoginUser(request);
         if (article.getPrivately() && !userRoleService.checkAuthorize(user, 2).isSuccess()) {
-            return "404";
+            return "/error/404";
         }
         return "article";
     }
@@ -85,7 +87,7 @@ public class WebController extends BaseController {
         long uid = Long.parseLong(url) / 12345;
         User user = userService.getById(uid);
         if (user == null) {
-            return "404";
+            return "/error/404";
         }
         log.info("用户信息{}",user);
         return "user";
@@ -98,7 +100,7 @@ public class WebController extends BaseController {
     public String category(HttpServletRequest request, @PathVariable String url) {
         Category category = categoryService.getOne(new QueryWrapper<Category>().eq("url", url));
         if (category == null) {
-            return "404";
+            return "/error/404";
         }
         return "category";
     }

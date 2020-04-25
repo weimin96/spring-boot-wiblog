@@ -96,7 +96,7 @@ public class GithubProvider {
                 .eq("identity_type", "github")
                 .eq("identifier", githubUser.get("node_id"))
                 .eq("state", 1));
-        User user = new User();
+        User user = User.of();
         // 未注册 直接插入数据
         if (userAuth == null) {
             user.setAvatarImg((String) githubUser.get("avatar_url"));

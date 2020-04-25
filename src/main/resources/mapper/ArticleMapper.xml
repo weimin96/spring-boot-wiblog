@@ -47,6 +47,9 @@ id,uid, author, title, content, tags, category_id, img_url, article_url, article
             <if test="state != null">
                 and a.privately = #{state}
             </if>
+            <if test="categoryId !=null">
+                and a.category_id = #{categoryId}
+            </if>
         </where>
         group by a.id order by a.create_time desc
     </select>
@@ -55,7 +58,7 @@ id,uid, author, title, content, tags, category_id, img_url, article_url, article
         select a.id,a.uid,a.title,a.author,a.content,a.tags,a.img_url,a.privately,a.reward,a.comment,
         a.category_id,a.create_time
         from article as a
-        where a.state = 1
+        where a.state = 1 and a.id=#{id}
     </select>
 
     <select id="selectArticleByUrl" resultType="com.wiblog.core.vo.ArticleDetailVo">
@@ -114,5 +117,17 @@ id,uid, author, title, content, tags, category_id, img_url, article_url, article
         <foreach collection="list" item="item" index="index" separator="," open="(" close=")">
             #{item}
         </foreach>
+    </select>
+
+    <select id="selectHits" resultType="java.util.Map">
+        select id,hits from article where state = 1
+    </select>
+
+    <select id="selectLikes" resultType="java.util.Map">
+        select id,likes from article where state = 1
+    </select>
+
+    <select id="selectListForTitleAndUrl" resultType="java.util.Map">
+        select id,title,article_url as url from article where state = 1
     </select>
 </mapper>

@@ -1,3 +1,6 @@
+body{
+    font-family: Lato, "PingFang SC", "Microsoft YaHei", sans-serif!important;
+}
 .main {
     padding-top: 10px;
     background: #f9fafd;
@@ -13,7 +16,7 @@
     margin-top: 15px;
 }
 .article-header .title {
-    font-size: 22px;
+    font-size: 24px;
     margin-bottom: 15px;
     line-height: 1.4;
     font-weight: bold;
@@ -335,6 +338,7 @@ img {
     color: #563d7c;
     background-color: transparent;
     border-left: 2px solid #563d7c;
+    word-break: break-word;
 }
 
 .nav>li>a{
@@ -343,6 +347,7 @@ img {
     font-size: 13px;
     font-weight: 500;
     color: #767676;
+    word-break: break-word;
 }
 
 .nav .nav{
@@ -363,4 +368,60 @@ td,th{
 
 a:hover {
     text-decoration:none;
+}
+
+/*引用*/
+blockquote{
+    border: none;
+    color: #314659;
+    margin: 20px 0;
+    padding: 0 0 0 10px;
+    min-height: 20px;
+    background: 0 0;
+    line-height: inherit;
+    border-left: 4px solid #dde5f1
+}
+
+p {
+    margin: 13px auto;
+    font-weight: 300;
+    font-size: 16px;
+}
+
+h3{
+    color: #1669b0;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 10px 0;
+}
+
+h4{
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 10px 0;
+    color: #009688;
+}
+
+pre code{
+    display: block;
+    color: #333;
+    overflow-x: auto;
+    background: #F2F4F5!important;
+    border: none!important;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace!important;
+    padding: 1em!important;
+    font-size: 14px!important;
+}
+
+#content ul li{
+    list-style: disc;
+    margin-left: 20px;
+}
+
+#content li ul li{
+    list-style: circle;
+}
+
+#content ol li{
+    list-style: decimal;
 }

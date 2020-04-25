@@ -4,11 +4,13 @@ let app = new Vue({
     data() {
         return{
             uid:Number(window.location.pathname.slice(6))/12345,
+            // 是否是自己
+            isMaster:false,
             user: {
 
             },
             userNew:{
-                username:user.username,
+                username:"",
                 sex:"male",
                 city:"",
                 intro:""
@@ -70,6 +72,9 @@ let app = new Vue({
             $.get("/u/info",{id:this.uid},function (res) {
                if (res.code === 10000){
                    vm.user=res.data;
+                   if(user !== null && user.uid === vm.user.uid){
+                       vm.isMaster = true;
+                   }
                    vm.userNew.intro = res.data.intro;
                    vm.userNew.sex = res.data.sex;
                    vm.userNew.city = res.data.city;

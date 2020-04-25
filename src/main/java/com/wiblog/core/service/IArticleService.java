@@ -7,8 +7,6 @@ import com.wiblog.core.entity.Article;
 import com.wiblog.core.entity.User;
 import com.wiblog.core.vo.ArticleDetailVo;
 
-import java.util.Set;
-
 /**
  *   服务类
  *
@@ -27,9 +25,10 @@ public interface IArticleService extends IService<Article> {
      * 获取文章列表
      * @param pageNum pageNum
      * @param pageSize pageSize
+     * @param categoryId 文章分类
      * @return ServerResponse
      */
-    ServerResponse<IPage> articlePageList(Integer pageNum, Integer pageSize);
+    ServerResponse<IPage> articlePageList(Integer pageNum, Integer pageSize,Long categoryId);
 
     /**
      * 获取文章详细信息
@@ -63,8 +62,7 @@ public interface IArticleService extends IService<Article> {
 
     /**
      * 文章排行榜
-     * @param rankSet rankSet
      * @return ServerResponse
      */
-    ServerResponse getArticleRank(Set<Object> rankSet);
+    ServerResponse getArticleRank();
 }

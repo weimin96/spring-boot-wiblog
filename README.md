@@ -41,7 +41,7 @@
 
 ## 功能
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321225642-9.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200425164109-wiblog-naotu.png)
 
 ## 技术栈
 
@@ -51,6 +51,5 @@ spring boot 、spring-mvc 、mybatis-plus 、mysql、redis 、elasticsearch、th
 
 1. 运行`myblog.sql`导入数据库
 2. 配置mysql数据库账号密码、redis账号密码、服务器ip地址
-3. 配置域名
-4. -spring.profiles.active=dev/prod选择环境启动
+3. -spring.profiles.active=dev/prod选择环境启动
 
