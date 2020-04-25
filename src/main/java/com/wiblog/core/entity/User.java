@@ -3,6 +3,8 @@ package com.wiblog.core.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -14,6 +16,9 @@ import java.util.Date;
  * @date 2019-06-01
  */
 @Data
+//@Builder
+@Accessors(chain = true)
+@RequiredArgsConstructor(staticName = "of")
 public class User implements Serializable{
 
     private static final long serialVersionUID = 1L;

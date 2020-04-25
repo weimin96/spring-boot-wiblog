@@ -30,7 +30,7 @@ var app = new Vue({
         formatterDate: function (row, column) {
             let date = new Date(row.createTime);
             let year = date.getFullYear();
-            let month = change(date.getMonth());
+            let month = change(date.getMonth()+1);
             let day = change(date.getDate());
 
             function change(t) {

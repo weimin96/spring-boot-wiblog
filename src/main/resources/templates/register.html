@@ -105,7 +105,7 @@
                     <el-input class="register-input" placeholder="请输入密码"
                               v-model.trim="password"
                               @keyup.enter.native="register"
-                              show-password="true"
+                              :show-password=true
                               autocomplete="off">
                         <i slot="prefix" class="el-input__icon el-icon-lock"></i>
                     </el-input>
@@ -123,7 +123,7 @@
                             @blur="checkConfirmPassword()"
                             v-model.trim="confirmPassword"
                             @keyup.enter.native="register"
-                            show-password="true"
+                            :show-password=true
                             autocomplete="off">
                         <i slot="prefix" class="el-input__icon el-icon-lock"></i>
                     </el-input>

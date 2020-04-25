@@ -34,7 +34,14 @@
                             <div class="information"><span v-if="user.sex === 'male'">男</span><span
                                     v-else>女</span><span>{{user.region}}</span><span>{{user.city}}</span></div>
                             <div class="more-info" @click="moreInfo"><i class="el-icon-arrow-down"></i><a>更多信息</a></div>
-                            <div id="intro">个人介绍：{{user.intro}}</div>
+                            <div id="intro">个人介绍：
+                                <template v-if="user.intro">
+                                    {{user.intro}}
+                                </template>
+                                <template v-else>
+                                    这个用户很懒，什么也没留下...
+                                </template>
+                            </div>
                         </div>
 
                         <!--统计-->
@@ -69,14 +76,21 @@
                                     <ul>
                                         <li :class="{sidebarActive:sidebarActive === 'message'} "
                                             @click="sidebarActive = 'message'"><i
-                                                class="fa fa-commenting-o"></i>我的消息
+                                                class="fa fa-commenting-o"></i>
+                                            <template v-if="isMaster">
+                                                我的消息
+                                            </template>
+                                            <template v-else>
+                                                他的消息
+                                            </template>
+
                                         </li>
                                         <li :class="{sidebarActive:sidebarActive === 'userSetting'}"
-                                            @click="gotoUserSetting"><i
+                                            @click="gotoUserSetting" v-if="isMaster"><i
                                                 class="el-icon-s-tools"></i>个人设置
                                         </li>
                                         <li :class="{sidebarActive:sidebarActive === 'user'}"
-                                            @click="sidebarActive = 'user'"><i
+                                            @click="sidebarActive = 'user'" v-if="isMaster"><i
                                                 class="fa fa-user"></i>我的帐户
                                         </li>
                                     </ul>

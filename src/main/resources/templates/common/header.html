@@ -28,6 +28,7 @@
                         <div class="message-box-user" v-show="showUserMessage">
                             <ul>
                                 <li>{{username}}</li>
+                                <template v-if="auth !== ''"><li @click="gotoAdmin"><i class="fa fa-window-restore"></i>管理后台</li></template>
                                 <li @click="gotoUserCenter"><i class="fa fa-user"></i>个人中心</li>
                                 <li @click="logout()"><i class="fa fa-power-off" ></i>退出</li>
                             </ul>

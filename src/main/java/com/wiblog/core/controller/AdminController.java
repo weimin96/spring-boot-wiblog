@@ -7,17 +7,15 @@ import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.Article;
 import com.wiblog.core.entity.Comment;
 import com.wiblog.core.entity.User;
+import com.wiblog.core.scheduled.RecordScheduled;
 import com.wiblog.core.service.IArticleService;
 import com.wiblog.core.service.ICommentService;
 import com.wiblog.core.service.IOpsService;
 import com.wiblog.core.service.IUserService;
 import com.wiblog.core.thirdparty.MonitorData;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
@@ -81,4 +79,12 @@ public class AdminController {
 
 
     }*/
+
+    @Autowired
+    private RecordScheduled recordScheduled;
+    @GetMapping("/push")
+    public String push() {
+        recordScheduled.pushArticle();
+        return "";
+    }
 }

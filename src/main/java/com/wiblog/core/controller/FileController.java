@@ -54,4 +54,10 @@ public class FileController {
     public ServerResponse getLogList(){
         return fileService.getLogList();
     }
+
+    @GetMapping("/showLog")
+    @AuthorizeCheck(grade = "2")
+    public ServerResponse showLog(String path,@RequestParam(value = "pageNum", defaultValue = "0")Integer pageNum){
+        return fileService.showLog(path,pageNum);
+    }
 }

@@ -12,7 +12,6 @@ import com.wiblog.core.entity.Article;
 import com.wiblog.core.entity.User;
 import com.wiblog.core.es.EsArticle;
 import com.wiblog.core.es.EsArticleRepository;
-import com.wiblog.core.scheduled.RecordScheduled;
 import com.wiblog.core.service.IArticleService;
 import com.wiblog.core.utils.PinYinUtil;
 import com.wiblog.core.utils.WiblogUtil;
@@ -84,8 +83,9 @@ public class ArticleController extends BaseController {
     @PostMapping("/articles")
     public ServerResponse<IPage> articlePageList(
             @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum,
-            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
-        return articleService.articlePageList(pageNum, pageSize);
+            @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
+            Long categoryId) {
+        return articleService.articlePageList(pageNum, pageSize,categoryId);
     }
 
     @PostMapping("/articlesManage")
@@ -139,24 +139,25 @@ public class ArticleController extends BaseController {
             return ServerResponse.error("文章发表失败，已存在相同标题", 30001);
         }
         Date date = new Date();
-        article.setUpdateTime(date);
-        article.setCreateTime(date);
-        article.setArticleUrl(articleUrl);
-        article.setHits(0);
+
         // 提取纯文本
         String content = WiblogUtil.mdToHtml(article.getContent());
         content = content.replaceAll("<[^>]+>","");
         content = content.replaceAll("\\s*|\t|\r|\n","");
         int length = Math.min(100,content.length());
-        article.setArticleSummary(content.substring(0,length));
         User user = getLoginUser(request);
-        article.setAuthor(user.getUsername());
-        article.setUid(user.getUid());
+        // 赋值
+        article.setUpdateTime(date).setCreateTime(date).setArticleUrl(articleUrl).setHits(0).setUid(user.getUid()).setAuthor(user.getUsername()).setArticleSummary(content.substring(0,length));
         boolean bool = articleService.save(article);
 
         if (bool) {
             Article article1 = articleService.getOne(new QueryWrapper<Article>().eq("title",article.getTitle()));
             articleRepository.save(new EsArticle(article1.getId(),article1.getTitle(),content,article1.getCategoryId(),article1.getCreateTime().getTime(),article1.getArticleUrl()));
+            // 文章简要信息
+            Map<String,Object> article2 = new HashMap<>();
+            article2.put("url",articleUrl);
+            article2.put("title",article.getTitle());
+            redisTemplate.opsForHash().put(Constant.ARTICLE_DETAIL_KEY,String.valueOf(article1.getId()),article2);
             return ServerResponse.success(articleUrl, "文章发表成功", title);
         }
         return ServerResponse.error("文章发表失败", 30001);
@@ -184,6 +185,7 @@ public class ArticleController extends BaseController {
         if (bool) {
 
             EsArticle esArticle = articleRepository.queryEsArticleByArticleId(article.getId());
+            // 没有就更新
             if (esArticle == null){
                 Article article1 = articleService.getById(article.getId());
                 esArticle = new EsArticle();
@@ -304,7 +306,11 @@ public class ArticleController extends BaseController {
         Integer count;
         count = (Integer) redisTemplate.opsForHash().get(Constant.LIKE_RECORD_KEY,articleId+"");
         if (count == null) {
-            count = 0;
+            Article article = articleService.getById(articleId);
+            if (article == null){
+                return ServerResponse.error("不存在该文章",30001);
+            }
+            count = article.getHits();
         }
         count++;
         redisTemplate.opsForHash().put(Constant.LIKE_RECORD_KEY , articleId+"", count);
@@ -324,13 +330,19 @@ public class ArticleController extends BaseController {
         Integer count;
         count = (Integer) redisTemplate.opsForHash().get(Constant.HIT_RECORD_KEY,articleId+"");
         if (count == null) {
-            count = 0;
+            Article article = articleService.getById(articleId);
+            if (article == null){
+                return ServerResponse.error("不存在该文章",30001);
+            }
+            count = article.getHits();
+
         }
         if (StringUtils.isNotBlank(check)){
             return ServerResponse.success(count);
         }
         count++;
         redisTemplate.opsForHash().put(Constant.HIT_RECORD_KEY , articleId+"", count);
+        // cookie保留2小时
         WiblogUtil.setCookie(response,"article_"+articleId,"1",60*60*2);
 
         return ServerResponse.success(count);
@@ -342,17 +354,16 @@ public class ArticleController extends BaseController {
      */
     @GetMapping("/getArticleRank")
     public ServerResponse getArticleRank(){
-        Set<Object> rankSet = redisTemplate.opsForZSet().range(Constant.ARTICLE_RANKING_KEY,0,9);
-
-
-        return articleService.getArticleRank(rankSet);
+        return articleService.getArticleRank();
     }
 
-    @Autowired
-    private RecordScheduled recordHit;
+    public String a ="a";
     @GetMapping("/test")
-    public Object test(){
-        recordHit.recordHit();
-        return null;
+    public Object test(String b){
+        if (StringUtils.isBlank(b)){
+            return a;
+        }
+        a = b;
+        return a;
     }
 }

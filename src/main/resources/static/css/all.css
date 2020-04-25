@@ -510,7 +510,8 @@ header .nav-search label{
 /*页脚*/
 #footer {
     background: #23282D;
-    padding: 40px 0 30px
+    padding: 40px 0 30px;
+    margin-top: 114px;
 }
 
 #footer p {
@@ -587,6 +588,10 @@ header .nav-search label{
 
 .rank-list li:hover{
     background: #dcdfe6;
+}
+
+.rank-list li div{
+    font-size: 13px;
 }
 
 

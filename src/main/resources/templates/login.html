@@ -28,7 +28,7 @@
                         v-model.trim="password"
                         @keyup.enter.native="login"
                         autocomplete="off"
-                        show-password="true">
+                        :show-password=true>
                     <i slot="prefix" class="el-input__icon el-icon-lock"></i>
                 </el-input>
                 <div class="error-msg">{{msgError}}</div>

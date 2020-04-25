@@ -51,7 +51,7 @@ public class MailServiceImpl {
             helper.setText(content,true);
             mailSender.send(message);
         } catch (MessagingException e) {
-            log.error("邮件发送异常");
+            log.error("邮件发送异常",e);
             //e.printStackTrace();
         }
     }

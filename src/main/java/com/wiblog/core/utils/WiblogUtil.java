@@ -20,10 +20,45 @@ import javax.servlet.http.HttpServletResponse;
 @Slf4j
 public class WiblogUtil {
 
+
     /**
      * markdown解析器
      */
     private static Parser parser = Parser.builder().build();
+
+    private static final HtmlRenderer renderer = HtmlRenderer.builder().build();
+            // 修饰代码块内容
+            /*.nodeRendererFactory(context -> new NodeRenderer() {
+
+                @Override
+                public Set<Class<? extends Node>> getNodeTypes() {
+                    return Collections.singleton(FencedCodeBlock.class);
+                }
+
+                @Override
+                public void render(Node node) {
+
+                    HtmlWriter html = context.getWriter();
+                    FencedCodeBlock codeBlock = (FencedCodeBlock) node;
+                    // 语言类型
+                    Map<String, String> attrs = new HashMap<>();
+                    if (!StringUtils.isEmpty(codeBlock.getInfo())) {
+                        attrs.put("class", "language-" + codeBlock.getInfo());
+                    }
+                    html.line();
+                    html.tag("pre");
+                    html.tag("code", attrs);
+                    String data = codeBlock.getLiteral();
+                    if (!attrs.isEmpty()) {
+                        data = compileKeyWord(data, attrs.get("class"));
+                    }
+                    html.text(data);
+                    html.tag("/code");
+                    html.tag("/pre");
+                    html.line();
+
+                }
+            }).build();*/
 
     /**
      * markdown转换为html
@@ -36,14 +71,14 @@ public class WiblogUtil {
             return "";
         }
         Node document = parser.parse(markdown);
-        HtmlRenderer renderer = HtmlRenderer.builder().build();
+
         String content = renderer.render(document);
         content = Commons.emoji(content);
         return content;
     }
 
 
-    public static void setCookie(HttpServletResponse response, String key,String value,int expire) {
+    public static void setCookie(HttpServletResponse response, String key, String value, int expire) {
         Cookie cookie = new Cookie(key, value);
         cookie.setDomain("");
         cookie.setPath("/");
@@ -76,14 +111,14 @@ public class WiblogUtil {
         }
     }
 
-    public static void delCookie(HttpServletRequest request, HttpServletResponse response){
+    public static void delCookie(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cookies = request.getCookies();
         if (cookies == null) {
             return;
         }
-        for (Cookie c:cookies){
-            if (Constant.COOKIES_KEY.equals(c.getName())){
-                log.info("删除cookie{}",c.getName());
+        for (Cookie c : cookies) {
+            if (Constant.COOKIES_KEY.equals(c.getName())) {
+                log.info("删除cookie{}", c.getName());
                 c.setMaxAge(0);
                 c.setValue(null);
                 c.setDomain("");
@@ -92,5 +127,46 @@ public class WiblogUtil {
                 break;
             }
         }
+    }
+
+    /*public static String compileKeyWord(String html, String language) {
+        List<String> keyWords = new ArrayList<>();
+        try {
+            File file = ResourceUtils.getFile("classpath:highLight/" + language);
+            if (!file.exists()) {
+                return html;
+            }
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                keyWords.add(line);
+            }
+            for (String s : keyWords) {
+                html = html.replaceAll(s, "<span class='keyword'>" + s + "</span>");
+            }
+        } catch (IOException e) {
+            log.error("异常",e);
+        }
+        return html;
+    }*/
+
+
+    public static void main(String[] args) {
+        String a = mdToHtml("#### EurekaClientAutoConfiguration\n" +
+                "\n" +
+                "- 获取客户端的连接信息，注入`eurekaInstanceConfigBean`\n" +
+                "- 创建`DiscoveryClient`,用于向服务端注册和维持心跳\n" +
+                "\n" +
+                "```java\n" +
+                "@Bean\n" +
+                "public DiscoveryClient discoveryClient(EurekaInstanceConfig config, EurekaClient client) {\n" +
+                "\treturn new EurekaDiscoveryClient(config, client);\n" +
+                "}\n" +
+                "@Bean\n" +
+                "public DiscoveryClient discoveryClient(EurekaInstanceConfig config, EurekaClient client) {\n" +
+                "\treturn new EurekaDiscoveryClient(config, client);\n" +
+                "}\n" +
+                "```");
+        System.out.println(a);
     }
 }

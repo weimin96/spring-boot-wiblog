@@ -3,6 +3,7 @@
 let vue = new Vue({
     el: "#index-header",
     data: {
+        auth:"",
         category: [],
         focusSearchLabel: false,
         searchInput: "",
@@ -23,9 +24,18 @@ let vue = new Vue({
             this.username = user.username;
             this.userUrl = user.uid*12345;
             this.getMessage();
+            // 管理权限
+            this.getAuth();
         }
     },
     methods: {
+        getAuth(){
+            $.get("/role/getAdminUrl",function (res) {
+                if (res.code === 10000){
+                    vue.auth = res.data;
+                }
+            })
+        },
         getMessage() {
             $.get("/getMessageCount", function (data) {
                 if (data.code === 10000) {
@@ -83,6 +93,10 @@ let vue = new Vue({
                 return;
             }
             window.location.href=window.location.protocol+"//"+window.location.host+"/search?key="+this.searchInput;
+        },
+        // 管理后台
+        gotoAdmin(){
+            window.location.href = this.auth;
         },
         // 个人中心
         gotoUserCenter() {

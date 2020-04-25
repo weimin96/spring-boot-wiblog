@@ -2,12 +2,12 @@ package com.wiblog.core.controller;
 
 
 import com.wiblog.core.aop.AuthorizeCheck;
-import com.wiblog.core.aop.OpsRecord;
 import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.User;
 import com.wiblog.core.service.IUserRoleService;
-
+import com.wiblog.core.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,9 +27,12 @@ public class UserRoleController extends BaseController{
 
     private IUserRoleService userRoleService;
 
+    private IUserService userService;
+
     @Autowired
-    public UserRoleController(IUserRoleService userRoleService){
+    public UserRoleController(IUserRoleService userRoleService, IUserService userService) {
         this.userRoleService = userRoleService;
+        this.userService = userService;
     }
 
     /**
@@ -68,5 +71,20 @@ public class UserRoleController extends BaseController{
     @PostMapping("/getAllRole")
     public ServerResponse getAllRole(HttpServletRequest request){
         return userRoleService.getRole();
+    }
+
+    /**
+     * 管理员获取后台链接
+     * @param request request
+     * @return ServerResponse
+     */
+    @GetMapping("/getAdminUrl")
+    public ServerResponse getAdminUrl(HttpServletRequest request){
+        User user = userService.loginUser(request);
+        ServerResponse response = userRoleService.checkAuthorize(user,2);
+        if (response.isSuccess()){
+            return ServerResponse.success("/admin");
+        }
+        return response;
     }
 }

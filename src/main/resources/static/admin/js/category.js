@@ -62,6 +62,7 @@ var app = new Vue({
                 this.name = row.name;
                 this.url = row.url;
                 this.rank = row.rank;
+                this.id = row.id;
             }
             this.addCategoryVisible = true;
         },
