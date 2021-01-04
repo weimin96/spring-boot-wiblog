@@ -16,7 +16,7 @@
             <div class="login-title-label">
                 <span class="login-title">欢迎登录<span>wiblog</span></span>
             </div>
-            <div class="login-form">
+            <div class="login-form" v-if="!qrcodeVisable">
                 <el-input class="first-input"
                         placeholder="用户名|手机号|邮箱"
                           @keyup.enter.native="login"
@@ -40,6 +40,28 @@
                     <div >没有账号？<a href="/register">点击注册</a></div>
                 </div>
             </div>
+            <div v-else>
+                <div style="text-align: center;">
+                    <p style="font-size: 14px;margin-bottom: 0px;">关注微信公众号获取登录验证码</p>
+                    <img src="/img/qrcode.jpg" alt="" width="170">
+
+                    <div style="padding-bottom: 10px;">
+                        <div class="el-input el-input-group el-input-group--append" style="width: 74%;">
+                            <input v-model="code" type="text" autocomplete="off" id="input" placeholder="输入登录验证码"
+                                   class="el-input__inner" style="width: 100%;height: 34px;">
+                            <div class="el-input-group__append">
+                                <button @click="wechatCode" type="button" class="el-button el-button--default" style="cursor: pointer;">
+                                    <span>登录</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hasAccount" style="padding: 0;">
+                        <div><a href="javascript:void(0)" @click="qrcodeVisable = false">账号密码登录</a></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="login-bottom">
@@ -49,6 +71,7 @@
             <div class="login-else">
                 <img src="/img/github_black.svg" alt="" @click="githubLogin">
                 <img src="/img/weibo_red.svg" alt="">
+                <img src="/img/wechat_green.svg" alt="" @click="qrcodeVisable=true">
             </div>
         </div>
     </div>

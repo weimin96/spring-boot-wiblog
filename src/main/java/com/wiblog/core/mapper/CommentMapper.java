@@ -81,16 +81,17 @@ public interface CommentMapper extends BaseMapper<Comment> {
     /**
      * 查询用户被评论回复
      *
-     * @param uid uid
+     * @param uid  uid
      * @param page page
      * @return List
      */
-    IPage<UserCommentVo> selectUserReplyByUid(Page<UserCommentVo> page,Long uid);
+    IPage<UserCommentVo> selectUserReplyByUid(Page<UserCommentVo> page, Long uid);
 
     /**
      * 更新用户id
+     *
      * @param oldUid oldUid
      * @param newUid newUid
      */
-    void updateUid(@Param("oldUid") Long oldUid,@Param("newUid") Long newUid);
+    void updateUid(@Param("oldUid") Long oldUid, @Param("newUid") Long newUid);
 }

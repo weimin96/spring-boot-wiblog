@@ -1,12 +1,12 @@
 package com.wiblog.core.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.wiblog.core.common.BaseController;
 import com.wiblog.core.common.Constant;
 import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.User;
 import com.wiblog.core.service.IMessageService;
 import com.wiblog.core.service.IUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands.GeoLocation;
 import org.springframework.data.redis.connection.RedisGeoCommands.GeoRadiusCommandArgs;
@@ -29,17 +29,20 @@ import java.util.Map;
 @RestController
 public class IndexController extends BaseController {
 
-    @Autowired
-    private IMessageService messageService;
+    private final IMessageService messageService;
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    public IndexController(IMessageService messageService, IUserService userService, RedisTemplate<String, Object> redisTemplate) {
+        this.messageService = messageService;
+        this.userService = userService;
+        this.redisTemplate = redisTemplate;
+    }
 
     @GetMapping("/getMessageCount")
-    public ServerResponse getMessageCount(HttpServletRequest request) {
+    public ServerResponse<?> getMessageCount(HttpServletRequest request) {
         User user = getLoginUser(request);
         if (user != null) {
             return messageService.getMessageCount(user.getUid());
@@ -57,7 +60,7 @@ public class IndexController extends BaseController {
      * @return ServerResponse
      */
     @GetMapping("/getNearUser")
-    public ServerResponse getNearUser(HttpServletRequest request, Double lat, Double lng) {
+    public ServerResponse<?> getNearUser(HttpServletRequest request, Double lat, Double lng) {
         if (lat == null || lng == null) {
             return ServerResponse.error("参数错误", 30001);
         }
@@ -77,9 +80,9 @@ public class IndexController extends BaseController {
         //限制查询数量
         geoRadiusArgs.limit(10);
 
-        GeoResults<GeoLocation<Object>> geoResults = redisTemplate.opsForGeo().radius(Constant.NEAR_USER_KEY, circle, geoRadiusArgs);
-        redisTemplate.opsForGeo().add(Constant.NEAR_USER_KEY, point, String.valueOf(user.getUid()));
-        List<Map> result = new ArrayList<>(10);
+        GeoResults<GeoLocation<Object>> geoResults = redisTemplate.opsForGeo().radius(Constant.RedisKey.NEAR_USER_KEY, circle, geoRadiusArgs);
+        redisTemplate.opsForGeo().add(Constant.RedisKey.NEAR_USER_KEY, point, String.valueOf(user.getUid()));
+        List<Map<String, Object>> result = new ArrayList<>(10);
         if (geoResults != null) {
             List<GeoResult<GeoLocation<Object>>> content = geoResults.getContent();
             for (GeoResult<GeoLocation<Object>> item : content) {
@@ -91,20 +94,20 @@ public class IndexController extends BaseController {
                 Map<String, Object> map = new HashMap<>(5);
                 double distance = item.getDistance().getValue();
                 int dis;
-                if (distance<=100){
+                if (distance <= 100) {
                     dis = 100;
-                }else {
+                } else {
                     String num = String.valueOf(distance).split("\\.")[0];
-                    dis = (Integer.valueOf(num.substring(0,1))*(int)Math.pow(10,num.length()-1));
+                    dis = (Integer.parseInt(num.substring(0, 1)) * (int) Math.pow(10, num.length() - 1));
                 }
                 // 单位
                 String unit;
-                if ("m".equals(item.getDistance().getMetric().getAbbreviation())){
+                if ("m".equals(item.getDistance().getMetric().getAbbreviation())) {
                     unit = "米";
-                }else{
+                } else {
                     unit = "公里";
                 }
-                map.put("distance",  dis+unit+"以内" );
+                map.put("distance", dis + unit + "以内");
 
                 User nearUser = userService.getOne(new QueryWrapper<User>().eq("uid", uid).eq("state", 1));
                 map.put("uid", nearUser.getUid());

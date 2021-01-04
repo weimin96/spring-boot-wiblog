@@ -16,7 +16,6 @@ import java.util.Date;
  * @date 2019-06-01
  */
 @Data
-//@Builder
 @Accessors(chain = true)
 @RequiredArgsConstructor(staticName = "of")
 public class User implements Serializable{

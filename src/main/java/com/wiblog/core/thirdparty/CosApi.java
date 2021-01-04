@@ -26,7 +26,7 @@ import java.util.Map;
 @Slf4j
 public class CosApi {
 
-    private COSClient client;
+    private final COSClient client;
 
     public CosApi(String secretId, String secretKey, String bucketSite) {
         // 1 初始化用户身份信息（secretId, secretKey）。

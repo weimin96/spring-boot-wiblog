@@ -10,8 +10,10 @@ import java.security.NoSuchAlgorithmException;
  * @date 2019/7/25
  */
 public class CheckoutUtil {
-    // 与接口配置信息中的Token要一致
-    private static String token = "wiblog";
+    /**
+     * 与接口配置信息中的Token要一致
+     */
+    private static final String TOKEN = "wiblog";
 
     /**
      * 验证签名
@@ -22,7 +24,7 @@ public class CheckoutUtil {
      * @return
      */
     public static boolean checkSignature(String signature, String timestamp, String nonce) {
-        String[] arr = new String[] { token, timestamp, nonce };
+        String[] arr = new String[] { TOKEN, timestamp, nonce };
         // 将token、timestamp、nonce三个参数进行字典序排序
         // Arrays.sort(arr);
         sort(arr);
@@ -43,21 +45,21 @@ public class CheckoutUtil {
         }
         content = null;
         // 将sha1加密后的字符串可与signature对比，标识该请求来源于微信
-        return tmpStr != null ? tmpStr.equals(signature.toUpperCase()) : false;
+        return tmpStr != null && tmpStr.equals(signature.toUpperCase());
     }
 
     /**
      * 将字节数组转换为十六进制字符串
      *
-     * @param byteArray
-     * @return
+     * @param byteArray byteArray
+     * @return strDigest
      */
     private static String byteToStr(byte[] byteArray) {
-        String strDigest = "";
-        for (int i = 0; i < byteArray.length; i++) {
-            strDigest += byteToHexStr(byteArray[i]);
+        StringBuilder strDigest = new StringBuilder();
+        for (byte b : byteArray) {
+            strDigest.append(byteToHexStr(b));
         }
-        return strDigest;
+        return strDigest.toString();
     }
 
     /**

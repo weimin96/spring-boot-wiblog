@@ -9,13 +9,14 @@ import com.wiblog.core.mapper.CommentMapper;
 import com.wiblog.core.mapper.UserAuthMapper;
 import com.wiblog.core.mapper.UserMapper;
 import com.wiblog.core.service.IUserService;
-
+import com.wiblog.core.utils.IPUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -38,17 +39,20 @@ public class GithubProvider {
     @Value("${github.redirect.uri}")
     private String redirectUrl;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
-    @Autowired
-    private UserAuthMapper userAuthMapper;
+    private final UserAuthMapper userAuthMapper;
 
-    @Autowired
-    private CommentMapper commentMapper;
+    private final CommentMapper commentMapper;
+
+    public GithubProvider(UserMapper userMapper, IUserService userService, UserAuthMapper userAuthMapper, CommentMapper commentMapper) {
+        this.userMapper = userMapper;
+        this.userService = userService;
+        this.userAuthMapper = userAuthMapper;
+        this.commentMapper = commentMapper;
+    }
 
     /**
      * 获取accessToken
@@ -91,7 +95,7 @@ public class GithubProvider {
      * @param token      token
      */
     @Transactional(rollbackFor = Exception.class)
-    public User registerGithub(Map githubUser, String token) {
+    public User registerGithub(Map githubUser, String token, HttpServletRequest request) {
         UserAuth userAuth = userAuthMapper.selectOne(new QueryWrapper<UserAuth>()
                 .eq("identity_type", "github")
                 .eq("identifier", githubUser.get("node_id"))
@@ -99,10 +103,13 @@ public class GithubProvider {
         User user = User.of();
         // 未注册 直接插入数据
         if (userAuth == null) {
+            String ip = IPUtil.getIpAddr(request);
+            String[] address = IPUtil.getIpInfo(ip);
+
             user.setAvatarImg((String) githubUser.get("avatar_url"));
             user.setUsername((String) githubUser.get("name"));
             user.setState(true);
-            user.setSex("male");
+            user.setSex("male").setRegion(address[0]).setCity(address[1]);
             user.setCreateTime(new Date());
             userMapper.insertReturnId(user);
 
@@ -120,7 +127,7 @@ public class GithubProvider {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse bingGithub(Long uid, Map githubUser, String token) {
+    public ServerResponse<?> bingGithub(Long uid, Map githubUser, String token) {
         // 该账号已经绑定了github
         int count = userAuthMapper.selectCount(new QueryWrapper<UserAuth>()
                 .eq("uid", uid)
@@ -160,4 +167,6 @@ public class GithubProvider {
         userAuthMapper.insert(userAuth);
         return ServerResponse.success(null, "绑定成功");
     }
+
+
 }

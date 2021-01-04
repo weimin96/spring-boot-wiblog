@@ -1,5 +1,8 @@
 package com.wiblog.core.aop;
 
+import com.wiblog.core.common.RoleEnum;
+import com.wiblog.core.weixin.MsgEnum;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -18,5 +21,6 @@ public @interface AuthorizeCheck {
     /**
      * 角色等级 1对应系统管理员 2对应普通管理员 3普通用户
      */
-    String grade() default "";
+    RoleEnum grade() default RoleEnum.USER;
+
 }

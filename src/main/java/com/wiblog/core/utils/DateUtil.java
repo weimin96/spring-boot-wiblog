@@ -16,19 +16,20 @@ public class DateUtil {
      * 直接使用SimpleDateFormat有线程安全问题
      * 使用ThreadLocal, 将共享变量变为独享
      */
-    private static ThreadLocal<DateFormat> sdfThreadLocal =  new ThreadLocal<DateFormat>(){
+    private static final ThreadLocal<DateFormat> SDF_THREAD_LOCAL = new ThreadLocal<DateFormat>() {
         @Override
-        public SimpleDateFormat initialValue(){
-            return  new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+08:00");
+        public SimpleDateFormat initialValue() {
+            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+08:00");
         }
     };
 
     /**
      * 转成utc格式
+     *
      * @param date date
      * @return String
      */
-    public static String formatDate(Date date){
-        return sdfThreadLocal.get().format(date);
+    public static String formatDate(Date date) {
+        return SDF_THREAD_LOCAL.get().format(date);
     }
 }

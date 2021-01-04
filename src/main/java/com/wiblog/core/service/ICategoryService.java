@@ -17,5 +17,5 @@ public interface ICategoryService extends IService<Category> {
      * @param id id
      * @return ServerResponse
      */
-    ServerResponse delCategory(Long id);
+    ServerResponse<?> delCategory(Long id);
 }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @EnableScheduling
-@PropertySource(value = "classpath:/config/wiblog.properties", encoding = "utf-8")
+@PropertySource(value = "classpath:/wiblog.properties", encoding = "utf-8")
 public class WeixinScheduled {
 
     @Value("${weixin-appID}")
@@ -38,21 +39,19 @@ public class WeixinScheduled {
      * 从微信服务端获取accessToken ticket并存入redis
      * 每隔两小时执行一次
      */
-//    @Scheduled(cron = "* * */2 * * ?")
-    public void setAccessTokenAndTicket(){
+    @Scheduled(cron = "0 0 */2 * * ?")
+    public void setAccessTokenAndTicket() {
         log.info("微信定时任务启动");
         String accessToken = weixinUtil.setAccessToken();
-        if (StringUtils.isNotBlank(accessToken)){
+        if (StringUtils.isNotBlank(accessToken)) {
             String ticket = weixinUtil.setTicket(accessToken);
-            if (StringUtils.isNotBlank(ticket)){
+            if (StringUtils.isNotBlank(ticket)) {
                 log.info("微信定时任务执行成功");
                 return;
             }
         }
         log.error("定时任务执行失败");
     }
-
-
 
 
 }

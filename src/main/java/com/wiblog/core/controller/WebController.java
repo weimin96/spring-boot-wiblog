@@ -1,6 +1,8 @@
 package com.wiblog.core.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.wiblog.core.common.BaseController;
+import com.wiblog.core.common.RoleEnum;
 import com.wiblog.core.entity.Article;
 import com.wiblog.core.entity.Category;
 import com.wiblog.core.entity.User;
@@ -9,7 +11,6 @@ import com.wiblog.core.service.ICategoryService;
 import com.wiblog.core.service.IUserRoleService;
 import com.wiblog.core.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,17 +25,20 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class WebController extends BaseController {
 
-    @Autowired
-    private IArticleService articleService;
+    private final IArticleService articleService;
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
-    @Autowired
-    private IUserRoleService userRoleService;
+    private final IUserRoleService userRoleService;
 
-    @Autowired
-    private ICategoryService categoryService;
+    private final ICategoryService categoryService;
+
+    public WebController(IArticleService articleService, IUserService userService, IUserRoleService userRoleService, ICategoryService categoryService) {
+        this.articleService = articleService;
+        this.userService = userService;
+        this.userRoleService = userRoleService;
+        this.categoryService = categoryService;
+    }
 
     /**
      * 跳转首页
@@ -73,7 +77,7 @@ public class WebController extends BaseController {
             return "/error/404";
         }
         User user = getLoginUser(request);
-        if (article.getPrivately() && !userRoleService.checkAuthorize(user, 2).isSuccess()) {
+        if (article.getPrivately() && !userRoleService.checkAuthorize(user, RoleEnum.ADMIN).isSuccess()) {
             return "/error/404";
         }
         return "article";
@@ -83,7 +87,7 @@ public class WebController extends BaseController {
      * 跳转用户中心
      */
     @GetMapping("/user/{url}")
-    public String userCenter(HttpServletRequest request, @PathVariable String url) {
+    public String userCenter(@PathVariable String url) {
         long uid = Long.parseLong(url) / 12345;
         User user = userService.getById(uid);
         if (user == null) {
@@ -97,7 +101,7 @@ public class WebController extends BaseController {
      * 跳转分类页
      */
     @GetMapping("/category/{url}")
-    public String category(HttpServletRequest request, @PathVariable String url) {
+    public String category(@PathVariable String url) {
         Category category = categoryService.getOne(new QueryWrapper<Category>().eq("url", url));
         if (category == null) {
             return "/error/404";

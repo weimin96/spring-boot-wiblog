@@ -21,12 +21,15 @@ import java.util.Map;
 @Service
 public class MessageServiceImpl extends ServiceImpl<MessageMapper, Message> implements IMessageService {
 
-    @Autowired
-    private MessageMapper messageMapper;
+    private final MessageMapper messageMapper;
+
+    public MessageServiceImpl(MessageMapper messageMapper) {
+        this.messageMapper = messageMapper;
+    }
 
 
     @Override
-    public ServerResponse getMessageCount(Long id) {
+    public ServerResponse<?> getMessageCount(Long id) {
         List<Map> list = messageMapper.selectCountList(id);
         return ServerResponse.success(list);
     }

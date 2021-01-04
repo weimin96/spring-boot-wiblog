@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  Mapper 接口
+ * Mapper 接口
  *
  * @author pwm
  * @since 2019-11-06

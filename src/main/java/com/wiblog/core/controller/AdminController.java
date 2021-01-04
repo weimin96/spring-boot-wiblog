@@ -3,6 +3,7 @@ package com.wiblog.core.controller;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencentcloudapi.monitor.v20180724.models.GetMonitorDataResponse;
 import com.wiblog.core.aop.AuthorizeCheck;
+import com.wiblog.core.common.RoleEnum;
 import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.Article;
 import com.wiblog.core.entity.Comment;
@@ -23,7 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * TODO 描述
+ * 管理界面控制层
  *
  * @author pwm
  * @date 2019/8/2
@@ -31,24 +32,30 @@ import java.util.Map;
 @RestController
 public class AdminController {
 
-    @Autowired
-    private MonitorData monitorData;
+    private final MonitorData monitorData;
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
-    @Autowired
-    private IArticleService articleService;
+    private final IArticleService articleService;
 
-    @Autowired
-    private ICommentService commentService;
+    private final ICommentService commentService;
 
-    @Autowired
-    private IOpsService opsService;
+    private final IOpsService opsService;
 
-    @AuthorizeCheck(grade = "2")
+    public AdminController(MonitorData monitorData, IUserService userService, IArticleService articleService, ICommentService commentService, IOpsService opsService) {
+        this.monitorData = monitorData;
+        this.userService = userService;
+        this.articleService = articleService;
+        this.commentService = commentService;
+        this.opsService = opsService;
+    }
+
+    /**
+     * 获取监控信息
+     */
+    @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @PostMapping("/getMonitorData")
-    public ServerResponse getMonitorData(String metric, Integer period, Date startTime, Date endTime) {
+    public ServerResponse<?> getMonitorData(String metric, Integer period, Date startTime, Date endTime) {
         GetMonitorDataResponse res = monitorData.getMonitorData(metric,period,startTime,endTime);
         if (res == null || res.getDataPoints()==null){
             return ServerResponse.error("获取监控数据失败",30001);
@@ -56,9 +63,12 @@ public class AdminController {
         return ServerResponse.success(res);
     }
 
-    @AuthorizeCheck(grade = "2")
+    /**
+     * 获取网站统计数据
+     */
+    @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @GetMapping("/getStaticData")
-    public ServerResponse getStaticData() {
+    public ServerResponse<?> getStaticData() {
         int userCount = userService.count(new QueryWrapper<User>().eq("state","1"));
         int articleCount = articleService.count(new QueryWrapper<Article>().eq("state","1"));
         int commentCount = commentService.count(new QueryWrapper<Comment>().eq("state","1"));
@@ -69,22 +79,5 @@ public class AdminController {
         result.put("hitCount",0);
         result.put("profitCount",0);
         return ServerResponse.success(result);
-    }
-
-    /*@AuthorizeCheck(grade = "2")
-    @GetMapping("/getOpsPageList")
-    public ServerResponse getOpsPageList(@RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
-                                         @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize,
-                                         @RequestParam(value = "orderBy", defaultValue = "asc") String orderBy){
-
-
-    }*/
-
-    @Autowired
-    private RecordScheduled recordScheduled;
-    @GetMapping("/push")
-    public String push() {
-        recordScheduled.pushArticle();
-        return "";
     }
 }

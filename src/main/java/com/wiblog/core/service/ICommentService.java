@@ -16,7 +16,7 @@ public interface ICommentService extends IService<Comment> {
      * @param comment comment
      * @return ServerResponse
      */
-    ServerResponse reply(Comment comment);
+    ServerResponse<?> reply(Comment comment);
 
     /**
      * 获取评论内容

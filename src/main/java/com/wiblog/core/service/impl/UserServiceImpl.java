@@ -14,6 +14,7 @@ import com.wiblog.core.exception.WiblogException;
 import com.wiblog.core.mapper.UserAuthMapper;
 import com.wiblog.core.mapper.UserMapper;
 import com.wiblog.core.service.IFileService;
+import com.wiblog.core.service.IMailService;
 import com.wiblog.core.service.IUserService;
 import com.wiblog.core.utils.Md5Util;
 import com.wiblog.core.utils.WiblogUtil;
@@ -42,6 +43,7 @@ import java.util.regex.Pattern;
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+
     @Autowired
     private UserMapper userMapper;
 
@@ -49,7 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private UserAuthMapper userAuthMapper;
 
     @Autowired
-    private MailServiceImpl mailService;
+    private IMailService mailService;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
@@ -68,10 +70,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         password = password.trim();
         // 用户名 邮箱 手机号
         UserAuth userAuth = new UserAuth();
-        if (account.matches(Constant.EM)) {
+        if (account.matches(Constant.Regular.EM)) {
 
             userAuth.setIdentityType("email");
-        } else if (account.matches(Constant.PH)) {
+        } else if (account.matches(Constant.Regular.PH)) {
             userAuth.setIdentityType("phone");
         } else {
             userAuth.setIdentityType("username");
@@ -88,7 +90,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void register(String username, String phone, String email, String mailCode,String password,String[] address) {
+    public void register(String username, String phone, String email, String mailCode, String password, String[] address) {
 
         // 校验用户名
         checkUsername(username);
@@ -122,9 +124,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             userAuthMapper.insert(userAuth);
         }
         // 校验邮箱
-        if (!StringUtils.isBlank(email) ){
+        if (!StringUtils.isBlank(email)) {
             checkEmail(email);
-            if (!mailService.checkEmail(email,mailCode)){
+            if (!mailService.checkEmail(email, mailCode)) {
                 throw new WiblogException("邮箱验证码错误");
             }
             // 校验成功
@@ -158,10 +160,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (username.length() < 4 || username.length() > 32) {
             throw new WiblogException(ResultConstant.UserCenter.USERNAME_LEN_ERROR_MSG);
         }
-        Pattern p = Pattern.compile(Constant.SPECIAL_CHAR);
+        Pattern p = Pattern.compile(Constant.Regular.SPECIAL_CHAR);
         Matcher m = p.matcher(username);
         //不能带特殊字符或纯数字
-        if (!username.matches(Constant.PURE_NUM_CHAR) || m.find()) {
+        if (!username.matches(Constant.Regular.PURE_NUM_CHAR) || m.find()) {
             throw new WiblogException(ResultConstant.UserCenter.USERNAME_ERROR_MSG);
         }
         //用户名已存在 只校验本地帐户
@@ -174,7 +176,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public void checkPhone(String phone) {
         // 手机号格式校验
-        if (!phone.matches(Constant.PH)) {
+        if (!phone.matches(Constant.Regular.PH)) {
             throw new WiblogException(ResultConstant.UserCenter.PHONE_ERROR_MSG);
         }
         //手机号已存在
@@ -187,7 +189,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public void checkEmail(String email) {
         // 邮箱格式校验
-        if (!email.matches(Constant.EM)) {
+        if (!email.matches(Constant.Regular.EM)) {
             throw new WiblogException(ResultConstant.UserCenter.EMAIL_ERROR_MSG);
         }
         //邮箱已存在
@@ -201,7 +203,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public User loginUser(HttpServletRequest request) {
         String token = WiblogUtil.getCookie(request, Constant.COOKIES_KEY);
         if (StringUtils.isNotBlank(token)) {
-            String userJson = (String) redisTemplate.opsForValue().get(Constant.LOGIN_REDIS_KEY + token);
+            String userJson = (String) redisTemplate.opsForValue().get(Constant.RedisKey.LOGIN_REDIS_KEY + token);
             if (StringUtils.isNotBlank(userJson)) {
                 return JSON.parseObject(userJson, User.class);
             }
@@ -210,13 +212,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public ServerResponse getAllUsername() {
+    public ServerResponse<?> getAllUsername() {
         List<Map<String, String>> list = userMapper.selectUsername();
         return ServerResponse.success(list);
     }
 
     @Override
-    public ServerResponse userManageListPage(Integer state, String username, Integer pageNum, Integer pageSize, String orderBy) {
+    public ServerResponse<?> userManageListPage(Integer state, String username, Integer pageNum, Integer pageSize, String orderBy) {
         Page<UserVo> page = new Page<>(pageNum, pageSize);
         if ("asc".equals(orderBy)) {
             page.setAsc("create_time");
@@ -228,32 +230,32 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public ServerResponse getBindingList(Long uid) {
-        List<UserAuth> list = userAuthMapper.selectList(new QueryWrapper<UserAuth>().eq("uid",uid).eq("state",1));
+    public ServerResponse<?> getBindingList(Long uid) {
+        List<UserAuth> list = userAuthMapper.selectList(new QueryWrapper<UserAuth>().eq("uid", uid).eq("state", 1));
         return ServerResponse.success(list);
     }
 
     @Override
-    public ServerResponse binding(Long uid, String type, String val, String code) {
+    public ServerResponse<?> binding(Long uid, String type, String val, String code) {
 
 
-        if ("email".equals(type)){
+        if ("email".equals(type)) {
             // 校验 验证码
-            String checkCode = (String) redisTemplate.opsForValue().get(Constant.CHECK_EMAIL_KEY + val);
-            if (StringUtils.isBlank(val) || !code.equals(checkCode)){
-                return ServerResponse.error("验证码错误",30001);
+            String checkCode = (String) redisTemplate.opsForValue().get(Constant.RedisKey.CHECK_EMAIL_KEY + val);
+            if (StringUtils.isBlank(val) || !code.equals(checkCode)) {
+                return ServerResponse.error("验证码错误", 30001);
             }
-        }else if("phone".equals(type)){
+        } else if ("phone".equals(type)) {
             return null;
-        }else{
-            return ServerResponse.error("类型错误",30001);
+        } else {
+            return ServerResponse.error("类型错误", 30001);
         }
 
         // 已经绑定过
-        List<UserAuth> userAuthList = userAuthMapper.selectList(new QueryWrapper<UserAuth>().eq("uid",uid).eq("state",1));
-        for (UserAuth item:userAuthList){
-            if (type.equals(item.getIdentityType())){
-                return ServerResponse.error("已经绑定过了",30001);
+        List<UserAuth> userAuthList = userAuthMapper.selectList(new QueryWrapper<UserAuth>().eq("uid", uid).eq("state", 1));
+        for (UserAuth item : userAuthList) {
+            if (type.equals(item.getIdentityType())) {
+                return ServerResponse.error("已经绑定过了", 30001);
             }
         }
         // 插入
@@ -262,38 +264,38 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userAuth.setIdentifier(val);
         userAuth.setIdentityType(type);
         userAuthMapper.insert(userAuth);
-        return ServerResponse.success(null,"绑定成功");
+        return ServerResponse.success(null, "绑定成功");
     }
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public ServerResponse deleteUser(Long uid) {
+    public ServerResponse<?> deleteUser(Long uid) {
         userMapper.updateStateToZero(uid);
-        userAuthMapper.updateStateToZero(uid,null);
-        return ServerResponse.success(null,"注销成功");
+        userAuthMapper.updateStateToZero(uid, null);
+        return ServerResponse.success(null, "注销成功");
     }
 
     @Override
-    public ServerResponse unBinding(Long uid, String type) {
-        userAuthMapper.updateStateToZero(uid,type);
+    public ServerResponse<?> unBinding(Long uid, String type) {
+        userAuthMapper.updateStateToZero(uid, type);
         return ServerResponse.success("解绑成功");
     }
 
     @Override
-    public ServerResponse setUserDetail(Long uid, User userNew) {
+    public ServerResponse<?> setUserDetail(Long uid, User userNew) {
         userNew.setUid(uid);
         userMapper.updateDetail(userNew);
         return ServerResponse.success("设置成功");
     }
 
     @Override
-    public ServerResponse setAvatar(Long uid, MultipartFile file) {
-        ServerResponse response = fileService.uploadImage(file,"avatar");
-        if (response.isSuccess()){
+    public ServerResponse<?> setAvatar(Long uid, MultipartFile file) {
+        ServerResponse<?> response = fileService.uploadImage(file, "avatar");
+        if (response.isSuccess()) {
             String url = (String) response.getData();
             User user = User.of().setUid(uid).setAvatarImg(url);
             userMapper.updateDetail(user);
-            return ServerResponse.success(url,"设置成功");
+            return ServerResponse.success(url, "设置成功");
         }
         return response;
     }

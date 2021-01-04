@@ -29,7 +29,14 @@ var app = new Vue({
         init: function () {
             $.post("/post/allArticles",function (res) {
                 if (res.code === 10000) {
-                    vm.titleArray = res.data;
+                    let temp = [];
+                    res.data.foreach((it)=>{
+                        let item = {};
+                        item.value = it.title;
+                        temp.push(item);
+
+                    })
+                    vm.titleArray = temp;
                 }
             });
             $.get("/u/getAllUsername",function (res) {

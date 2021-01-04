@@ -25,7 +25,7 @@ public class MapCache {
     /**
      * 缓存容器
      */
-    private Map<String, CacheObject> cachePool;
+    private final Map<String, CacheObject> cachePool;
 
     public MapCache() {
         this(DEFAULT_CACHES);

@@ -2,6 +2,7 @@ package com.wiblog.core.utils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 /**
  * 狗屁文章生成
@@ -21,9 +22,9 @@ public final class EssayGeneratorUtil {
     }
 
     private static String essayGenerator(String theme, int sum) {
-        StringBuffer res = new StringBuffer(sum);
+        StringBuilder res = new StringBuilder(sum);
         while (res.length() < sum) {
-            int num = (int) (Math.random() * 100);
+            int num = new Random().nextInt(100);
             if (num < 5) {
                 //5%概率换个行
                 res.append("\r\n");
@@ -33,7 +34,7 @@ public final class EssayGeneratorUtil {
                         .replace("a", randomChoice(before))
                         .replace("b", randomChoice(after))
                 );
-                if ((int) (Math.random() * 100) < 50) {
+                if (new Random().nextInt(100) < 50) {
                     //写完名言后50%概率换个行
                     res.append("\r\n");
                 }

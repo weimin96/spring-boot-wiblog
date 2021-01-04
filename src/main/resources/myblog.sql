@@ -24,6 +24,7 @@ CREATE TABLE `user`
   AUTO_INCREMENT = 16
   DEFAULT CHARSET = utf8;
 
+INSERT INTO `myblog`.`user` (`uid`, `username`, `sex`, `avatar_img`, `intro`, `region`, `city`, `state`, `create_time`) VALUES (16, 'admin', 'male', 'https://www.wiblog.cn/img/reply-avatar.svg', '', '', '广东省广州市', 1, '2020-12-27 23:12:38');
 
 
 -- ----------------------------
@@ -45,6 +46,8 @@ CREATE TABLE `user_auth`
   AUTO_INCREMENT = 16
   DEFAULT CHARSET = utf8;
 
+INSERT INTO `myblog`.`user_auth` (`id`, `uid`, `identity_type`, `identifier`, `password`, `state`, `create_time`, `logged`)
+VALUES (16, 16, 'username', 'admin', '74A11FB87D6A947022D1658D06E0D7AB', 1, '2020-12-27 23:12:39', NULL);
 
 
 -- ----------------------------
@@ -81,10 +84,13 @@ CREATE TABLE `user_role`
     `uid`     BIGINT(11) NOT NULL COMMENT '用户id',
     `role_id` BIGINT(11) NOT NULL COMMENT '角色id',
     PRIMARY KEY (`id`),
-    UNIQUE key `uid` (`uid`)
+    UNIQUE KEY `uid_roleid` (`uid`,`role_id`) USING BTREE
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8;
 
+INSERT INTO `myblog`.`user_role` (`id`, `uid`, `role_id`) VALUES (1, 16, 1);
+INSERT INTO `myblog`.`user_role` (`id`, `uid`, `role_id`) VALUES (2, 16, 2);
+INSERT INTO `myblog`.`user_role` (`id`, `uid`, `role_id`) VALUES (3, 16, 3);
 
 -- ----------------------------
 -- 用户设置表

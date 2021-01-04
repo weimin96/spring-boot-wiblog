@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  Mapper 接口
+ * Mapper 接口
  *
  * @author pwm
  * @since 2019-06-12
@@ -22,15 +22,10 @@ import java.util.Map;
 public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
-     * 获取所有文章标题
-     * @return List<String>
-     */
-    List<Map<String,String>> selectAllArticle();
-
-    /**
      * 获取文章分页列表
-     * @param page page
-     * @param state 私密
+     *
+     * @param page       page
+     * @param state      私密
      * @param categoryId 文章分类
      * @return IPage
      */
@@ -40,6 +35,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
      * 获取文章详细信息
+     *
      * @param id id
      * @return ArticleVo
      */
@@ -47,6 +43,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
      * 文章页获取文章所有信息
+     *
      * @param url url
      * @return ArticleDetailVo
      */
@@ -54,6 +51,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
      * 修改文章分类为未分类
+     *
      * @param id id
      * @return int
      */
@@ -61,6 +59,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
      * 修改文章状态为0
+     *
      * @param id id
      * @return int
      */
@@ -68,6 +67,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
      * 批量更新点击率
+     *
      * @param list list
      * @return int
      */
@@ -75,6 +75,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
      * 通过id队列查找文章列表
+     *
      * @param list list
      * @return List
      */
@@ -82,14 +83,25 @@ public interface ArticleMapper extends BaseMapper<Article> {
 
     /**
      * 批量更新点赞
+     *
      * @param likeList likeList
      * @return int
      */
     int updateLikesBatch(List<Map> likeList);
 
-    List<Map> selectHits();
+    /**
+     * 获取点击数和文章id
+     *
+     * @return List
+     */
+    List<Map<String, Object>> selectHits();
 
-    List<Map> selectLikes();
+    /**
+     * 获取点赞数和文章id
+     *
+     * @return List
+     */
+    List<Map<String, Object>> selectLikes();
 
     List<Map> selectListForTitleAndUrl();
 }

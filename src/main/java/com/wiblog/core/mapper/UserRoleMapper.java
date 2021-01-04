@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- *  Mapper 接口
+ * Mapper 接口
  *
  * @author pwm
  * @since 2019-10-09
@@ -18,6 +18,7 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
 
     /**
      * 查找用户角色
+     *
      * @param uid uid
      * @return List
      */
@@ -25,14 +26,8 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
 
     /**
      * 查找权限类别
+     *
      * @return List
      */
     List<RoleVo> selectRole();
-
-    /**
-     * 插入或更新用户权限
-     * @param role role
-     * @return Integer
-     */
-    Integer insertOrUpdate(UserRole role);
 }

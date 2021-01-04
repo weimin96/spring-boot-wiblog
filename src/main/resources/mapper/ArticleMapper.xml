@@ -30,10 +30,6 @@
 id,uid, author, title, content, tags, category_id, img_url, article_url, article_summary, hits,likes, privately, reward, comment, state,create_time, update_time
     </sql>
 
-    <select id="selectAllArticle" resultType="map">
-        select title as value from article where state = 1
-    </select>
-
     <select id="selectPageList" resultType="com.wiblog.core.vo.ArticlePageVo">
         select
         a.id,a.uid,a.title,a.author,a.article_summary,a.tags,a.img_url,a.hits,a.privately,a.reward,a.comment,a.article_url,
@@ -120,11 +116,11 @@ id,uid, author, title, content, tags, category_id, img_url, article_url, article
     </select>
 
     <select id="selectHits" resultType="java.util.Map">
-        select id,hits from article where state = 1
+        select id,hits from article where state = 1 and privately = 0
     </select>
 
     <select id="selectLikes" resultType="java.util.Map">
-        select id,likes from article where state = 1
+        select id,likes from article where state = 1 and privately = 0
     </select>
 
     <select id="selectListForTitleAndUrl" resultType="java.util.Map">
