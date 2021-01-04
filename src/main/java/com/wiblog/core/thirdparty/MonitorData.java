@@ -7,7 +7,6 @@ import com.tencentcloudapi.common.profile.HttpProfile;
 import com.tencentcloudapi.monitor.v20180724.MonitorClient;
 import com.tencentcloudapi.monitor.v20180724.models.GetMonitorDataRequest;
 import com.tencentcloudapi.monitor.v20180724.models.GetMonitorDataResponse;
-import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.utils.DateUtil;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +22,7 @@ import java.util.Date;
  * @date 2019/10/24
  */
 @Component
-@PropertySource(value = "classpath:/config/wiblog.properties", encoding = "utf-8")
+@PropertySource(value = "classpath:/wiblog.properties", encoding = "utf-8")
 public class MonitorData {
 
     @Value("${qcloud-secret-id}")

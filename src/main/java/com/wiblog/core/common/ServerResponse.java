@@ -15,8 +15,8 @@ public class ServerResponse<T> implements Serializable {
     private static final long serialVersionUID = -516174735253208470L;
 
 
-    private int code;
-    private String msg;
+    private final int code;
+    private final String msg;
     private T data;
     private T extra;
 

@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wiblog.core.aop.AuthorizeCheck;
 import com.wiblog.core.aop.OpsRecord;
 import com.wiblog.core.common.Constant;
+import com.wiblog.core.common.RoleEnum;
 import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.Category;
 import com.wiblog.core.service.ICategoryService;
@@ -30,15 +31,17 @@ import java.util.List;
 @RequestMapping("/category")
 public class CategoryController {
 
-    private ICategoryService categoryService;
+    private final ICategoryService categoryService;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    public CategoryController(ICategoryService categoryService) {
+    public CategoryController(ICategoryService categoryService, RedisTemplate<String, Object> redisTemplate) {
         this.categoryService = categoryService;
+        this.redisTemplate = redisTemplate;
     }
+
+    public static final String DATABASE_TYPE = "database";
 
     /**
      * 获取分类
@@ -46,12 +49,13 @@ public class CategoryController {
      * @return ServerResponse
      */
     @GetMapping("/getCategory")
-    public ServerResponse getCategory(String type) {
+    public ServerResponse<?> getCategory(String type) {
         // 数据库中读取
-        if ("database".equals(type)) {
+        if (DATABASE_TYPE.equals(type)) {
             List<Category> list = categoryService.list(new QueryWrapper<Category>().orderByDesc("rank"));
             return ServerResponse.success(list, "获取分类列表成功");
         }
+        // 默认读缓存
         return ServerResponse.success(getCategory(), "获取分类列表成功");
     }
 
@@ -62,10 +66,10 @@ public class CategoryController {
      * @param parentId parentId
      * @return ServerResponse
      */
-    @AuthorizeCheck(grade = "2")
+    @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @PostMapping("/addCategory")
     @OpsRecord(msg = "添加了分类<<{0}>>")
-    public ServerResponse addCategory(String name, String url, Long parentId) {
+    public ServerResponse<?> addCategory(String name, String url, Long parentId) {
         Category category = new Category();
         category.setName(name);
         category.setUrl(url);
@@ -80,19 +84,23 @@ public class CategoryController {
     }
 
     /**
-     * 更新分类
+     * 更新分类 延时双删
      *
      * @param category category
      * @return ServerResponse
      */
-    @AuthorizeCheck(grade = "2")
+    @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @PostMapping("/updateCategory")
     @OpsRecord(msg = "更新了分类<<{0}>>")
-    public ServerResponse updateCategory(Category category) {
+    public ServerResponse<?> updateCategory(Category category) {
+        // 先删除缓存
+        redisTemplate.delete(Constant.RedisKey.CATEGORY_KEY);
+        // 更新数据库
         boolean tag = categoryService.updateById(category);
         if (!tag) {
             return ServerResponse.error("更新分类失败", 30001);
         }
+        // 再删除缓存 保证再次请求的回溯到最新的数据
         delRedisForCategory();
         return ServerResponse.success(null, "更新分类成功", category.getName());
     }
@@ -103,11 +111,11 @@ public class CategoryController {
      * @param id id
      * @return ServerResponse
      */
-    @AuthorizeCheck(grade = "2")
+    @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @OpsRecord(msg = "删除了分类<<{0}>>")
     @PostMapping("/delCategory")
-    public ServerResponse delCategory(Long id) {
-        ServerResponse response = categoryService.delCategory(id);
+    public ServerResponse<?> delCategory(Long id) {
+        ServerResponse<?> response = categoryService.delCategory(id);
         if (response.isSuccess()) {
             delRedisForCategory();
         }
@@ -122,7 +130,7 @@ public class CategoryController {
      * @return ServerResponse
      */
     @GetMapping("/getCategoryIdByUrl")
-    public ServerResponse getCategoryIdByUrl(String url) {
+    public ServerResponse<?> getCategoryIdByUrl(String url) {
         for (Category c : getCategory()) {
             if (c.getUrl().equals(url)) {
                 return ServerResponse.success(c.getId(), "获取分类id成功");
@@ -135,12 +143,12 @@ public class CategoryController {
      * 缓存有读缓存，没有读数据库再更新缓存
      */
     private List<Category> getCategory() {
-        String json = (String) redisTemplate.opsForValue().get(Constant.CATEGORY_KEY);
+        String json = (String) redisTemplate.opsForValue().get(Constant.RedisKey.CATEGORY_KEY);
         List<Category> list;
         if (StringUtil.isBlank(json)) {
             list = categoryService.list(new QueryWrapper<Category>().orderByDesc("rank"));
             String data = JSONObject.toJSONString(list);
-            redisTemplate.opsForValue().set(Constant.CATEGORY_KEY, data);
+            redisTemplate.opsForValue().set(Constant.RedisKey.CATEGORY_KEY, data);
         } else {
             list = JSONObject.parseArray(json, Category.class);
         }
@@ -150,10 +158,10 @@ public class CategoryController {
     /**
      * 延时删除
      */
-    private void delRedisForCategory(){
+    private void delRedisForCategory() {
         try {
             Thread.sleep(500);
-            redisTemplate.delete(Constant.CATEGORY_KEY);
+            redisTemplate.delete(Constant.RedisKey.CATEGORY_KEY);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

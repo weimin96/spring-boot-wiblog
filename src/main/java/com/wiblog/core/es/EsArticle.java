@@ -19,7 +19,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-@Document(indexName = "article",type = "article")
+@Document(indexName = "article")
 public class EsArticle  implements Serializable {
     private static final long serialVersionUID = -7577471814974481136L;
 

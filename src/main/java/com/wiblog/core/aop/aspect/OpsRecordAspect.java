@@ -6,23 +6,20 @@ import com.wiblog.core.entity.Ops;
 import com.wiblog.core.entity.User;
 import com.wiblog.core.service.IOpsService;
 import com.wiblog.core.service.IUserService;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.text.MessageFormat;
 import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * 管理员操作记录
@@ -35,11 +32,14 @@ import javax.servlet.http.HttpServletRequest;
 public class OpsRecordAspect {
 
 
-    @Autowired
-    private IUserService userService;
+    private final IUserService userService;
 
-    @Autowired
-    private IOpsService opsService;
+    private final IOpsService opsService;
+
+    public OpsRecordAspect(IUserService userService, IOpsService opsService) {
+        this.userService = userService;
+        this.opsService = opsService;
+    }
 
     /**
      * 加入注解 @OpsRecord 时触发
@@ -60,18 +60,16 @@ public class OpsRecordAspect {
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         // 获取request
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
-
-        // 获取注解的方法参数列表
-        Object[] args = pjp.getArgs();
 
         // 获取被注解的方法
         MethodInvocationProceedingJoinPoint mjp = (MethodInvocationProceedingJoinPoint) pjp;
         MethodSignature signature = (MethodSignature) mjp.getSignature();
         Method method = signature.getMethod();
 
-        ServerResponse result = (ServerResponse) pjp.proceed();
-        if (result.isSuccess()){
+        ServerResponse<?> result = (ServerResponse<?>) pjp.proceed();
+        if (result != null && result.isSuccess()){
             OpsRecord opsRecord = method.getAnnotation(OpsRecord.class);
             String msg = opsRecord.msg();
             msg = MessageFormat.format(msg,result.getExtra());

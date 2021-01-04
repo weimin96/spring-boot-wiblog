@@ -34,7 +34,7 @@ import java.util.stream.Stream;
  */
 @Slf4j
 @Service
-@PropertySource(value = "classpath:/config/wiblog.properties", encoding = "utf-8")
+@PropertySource(value = "classpath:/wiblog.properties", encoding = "utf-8")
 public class FileServiceImpl implements IFileService {
 
     @Autowired
@@ -44,7 +44,7 @@ public class FileServiceImpl implements IFileService {
     private String secretId;
 
     @Value("${qcloud-secret-key}")
-    private String secretkey;
+    private String secretKey;
 
     @Value("${qcloud-oss-bucket-site}")
     private String bucketSite;
@@ -56,11 +56,11 @@ public class FileServiceImpl implements IFileService {
     private String path;
 
     @Override
-    public ServerResponse uploadImage(MultipartFile file, String type) {
+    public ServerResponse<?> uploadImage(MultipartFile file, String type) {
         if (StringUtils.isBlank(file.getOriginalFilename())) {
             return ServerResponse.error("文件为空", 40001);
         }
-        CosApi cosApi = new CosApi(secretId, secretkey, bucketSite);
+        CosApi cosApi = new CosApi(secretId, secretKey, bucketSite);
         // 生成文件名
         Date date = new Date();
         SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss-");
@@ -87,7 +87,7 @@ public class FileServiceImpl implements IFileService {
         // 返回的数据结果
         Map<String, Object> result = new HashMap<>(3);
         if (StringUtils.isNotBlank(file.getOriginalFilename())) {
-            CosApi cosApi = new CosApi(secretId, secretkey, bucketSite);
+            CosApi cosApi = new CosApi(secretId, secretKey, bucketSite);
             // 生成文件名
             Date date = new Date();
             SimpleDateFormat sf = new SimpleDateFormat("yyyyMMddHHmmss-");
@@ -119,16 +119,16 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public ServerResponse getImageList(Integer pageNum, Integer pageSize) {
+    public ServerResponse<?> getImageList(Integer pageNum, Integer pageSize) {
         Page<Picture> page = new Page<>(pageNum, pageSize);
         IPage<Picture> iPage = pictureMapper.selectPageList(page);
         return ServerResponse.success(iPage, "获取图片列表成功");
     }
 
     @Override
-    public ServerResponse delImage(Long id) {
+    public ServerResponse<?> delImage(Long id) {
         Picture picture = pictureMapper.selectById(id);
-        CosApi cosApi = new CosApi(secretId, secretkey, bucketSite);
+        CosApi cosApi = new CosApi(secretId, secretKey, bucketSite);
         boolean tag = cosApi.removeFile(bucketName, picture.getName());
         if (tag) {
             int count = pictureMapper.deleteById(id);
@@ -140,16 +140,19 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public ServerResponse getLogList() {
+    public ServerResponse<?> getLogList() {
         List<Map<String, Object>> fileList = new ArrayList<>();
         try {
             File file = new File(Constant.LOG_PATH);
             File[] files = file.listFiles();
-            for (int i = 0; i < files.length; i++) {
-                if (files[i].isFile()) {
+            if (files == null){
+                return ServerResponse.success(null, "文件不存在，请检查文件路径");
+            }
+            for (File value : files) {
+                if (value.isFile()) {
                     Map<String, Object> temp = new HashMap<>(2);
-                    temp.put("path", files[i].getPath());
-                    temp.put("name", files[i].getName());
+                    temp.put("path", value.getPath());
+                    temp.put("name", value.getName());
                     fileList.add(temp);
                 }
             }
@@ -161,7 +164,7 @@ public class FileServiceImpl implements IFileService {
     }
 
     @Override
-    public ServerResponse showLog(String path, Integer pageNum) {
+    public ServerResponse<?> showLog(String path, Integer pageNum) {
         Map<String, Object> result = new HashMap<>(2);
         try {
             Path paths = Paths.get(path);

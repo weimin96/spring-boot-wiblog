@@ -1,26 +1,23 @@
 package com.wiblog.core.aop.aspect;
 
-import com.alibaba.fastjson.JSON;
 import com.wiblog.core.aop.AuthorizeCheck;
+import com.wiblog.core.common.RoleEnum;
 import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.User;
 import com.wiblog.core.service.IUserRoleService;
 import com.wiblog.core.service.IUserService;
-
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.lang.reflect.Method;
-
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Method;
 
 /**
  * 权限校验
@@ -32,10 +29,13 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 public class AuthorizeCheckAspect {
 
-    @Autowired
-    private IUserRoleService userRoleService;
-    @Autowired
-    private IUserService  userService;
+    private final IUserRoleService userRoleService;
+    private final IUserService userService;
+
+    public AuthorizeCheckAspect(IUserRoleService userRoleService, IUserService userService) {
+        this.userRoleService = userRoleService;
+        this.userService = userService;
+    }
 
     /**
      * 加入注解 @AuthorizeCheck 时触发
@@ -47,6 +47,7 @@ public class AuthorizeCheckAspect {
 
     /**
      * controller层增强类
+     *
      * @param pjp pjp
      * @return java.lang.Object
      * @throws Throwable Throwable
@@ -55,10 +56,8 @@ public class AuthorizeCheckAspect {
     public Object around(ProceedingJoinPoint pjp) throws Throwable {
         // 获取request
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        assert attributes != null;
         HttpServletRequest request = attributes.getRequest();
-
-        // 获取注解的方法参数列表
-        Object[] args = pjp.getArgs();
 
         // 获取被注解的方法
         MethodInvocationProceedingJoinPoint mjp = (MethodInvocationProceedingJoinPoint) pjp;
@@ -66,17 +65,11 @@ public class AuthorizeCheckAspect {
         Method method = signature.getMethod();
 
         AuthorizeCheck authorizeCheck = method.getAnnotation(AuthorizeCheck.class);
-        String gradeStr = authorizeCheck.grade();
-        int grade;
-        try{
-            grade = Integer.parseInt(gradeStr);
-        }catch (NumberFormatException e){
-            throw new RuntimeException("使用@AuthorizeCheck注解时必须指定grade的值，且为数值类型");
-        }
+        RoleEnum gradeEnum = authorizeCheck.grade();
         User user = userService.loginUser(request);
         // 检查当前登录用户的权限级别
-        ServerResponse serverResponse = userRoleService.checkAuthorize(user,grade);
-        if (!serverResponse.isSuccess()){
+        ServerResponse<?> serverResponse = userRoleService.checkAuthorize(user, gradeEnum);
+        if (!serverResponse.isSuccess()) {
             return serverResponse;
         }
         // 如果没有报错，放行

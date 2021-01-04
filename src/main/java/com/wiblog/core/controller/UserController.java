@@ -3,7 +3,9 @@ package com.wiblog.core.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.wiblog.core.aop.AuthorizeCheck;
+import com.wiblog.core.common.BaseController;
 import com.wiblog.core.common.Constant;
+import com.wiblog.core.common.RoleEnum;
 import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.User;
 import com.wiblog.core.exception.WiblogException;
@@ -38,35 +40,34 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class UserController extends BaseController {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
+
+    private final IUserService userService;
+
+    private final IUserRoleService userRoleService;
+
+    private final GithubProvider githubProvider;
 
     @Autowired
-    private IUserService userService;
-
-    @Autowired
-    private IUserRoleService userRoleService;
-
-    @Autowired
-    private GithubProvider githubProvider;
-
-    @Autowired
-    public UserController(IUserService userService) {
+    public UserController(IUserService userService, GithubProvider githubProvider, RedisTemplate<String, Object> redisTemplate, IUserRoleService userRoleService) {
         this.userService = userService;
+        this.githubProvider = githubProvider;
+        this.redisTemplate = redisTemplate;
+        this.userRoleService = userRoleService;
     }
 
     @PostMapping("/login")
-    public ServerResponse login(String account, String password, HttpServletRequest request, HttpServletResponse response) {
+    public ServerResponse<?> login(String account, String password, HttpServletRequest request, HttpServletResponse response) {
         System.out.println("登录");
         // 错误次数
         Integer errorCount = cache.get("login_error_count");
-        ServerResponse serverResponse;
+        ServerResponse<User> serverResponse;
         try {
             serverResponse = userService.login(account, password);
-            User user = (User) serverResponse.getData();
+            User user = serverResponse.getData();
             // redis缓存
             String token = Md5Util.MD5(request.getSession().getId() + user.getUid().toString());
-            redisTemplate.opsForValue().set(Constant.LOGIN_REDIS_KEY + token, JSON.toJSONString(user), 7, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(Constant.RedisKey.LOGIN_REDIS_KEY + token, JSON.toJSONString(user), 7, TimeUnit.DAYS);
             // cookies
             WiblogUtil.setCookie(response, token);
             // TODO 登录日志
@@ -93,24 +94,23 @@ public class UserController extends BaseController {
     }
 
     @GetMapping("/logout")
-    public ServerResponse logout(HttpServletRequest request, HttpServletResponse response) {
+    public ServerResponse<?> logout(HttpServletRequest request, HttpServletResponse response) {
         String token = WiblogUtil.getCookie(request, Constant.COOKIES_KEY);
         if (StringUtils.isNotBlank(token)) {
             WiblogUtil.delCookie(request, response);
-            Boolean bool = redisTemplate.delete(Constant.LOGIN_REDIS_KEY + token);
+            Boolean bool = redisTemplate.delete(Constant.RedisKey.LOGIN_REDIS_KEY + token);
             log.info("退出登录{}", bool);
         }
-
         return ServerResponse.success(null, "退出成功");
     }
 
     @PostMapping("/register")
-    public ServerResponse register(HttpServletRequest request, String username, String phone, String email, String password,String emailCode) {
+    public ServerResponse<?> register(HttpServletRequest request, String username, String phone, String email, String password, String emailCode) {
         try {
             String ip = IPUtil.getIpAddr(request);
             String[] address = IPUtil.getIpInfo(ip);
-            log.info("用户地址{}-{}",address[0],address[1]);
-            userService.register(username, phone, email, emailCode,password, address);
+            log.info("用户地址{}-{}", address[0], address[1]);
+            userService.register(username, phone, email, emailCode, password, address);
         } catch (Exception e) {
             String msg = "注册失败";
             if (e instanceof WiblogException) {
@@ -130,14 +130,14 @@ public class UserController extends BaseController {
      * @return ServerResponse
      */
     @GetMapping("/info")
-    public ServerResponse getUserById(Long id) {
+    public ServerResponse<?> getUserById(Long id) {
         User user = userService.getById(id);
         return ServerResponse.success(user);
     }
 
 
     @PostMapping("/checkUsername")
-    public ServerResponse checkUsername(String value) {
+    public ServerResponse<?> checkUsername(String value) {
         try {
             userService.checkUsername(value);
         } catch (WiblogException e) {
@@ -147,7 +147,7 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/checkPhone")
-    public ServerResponse checkPhone(String value) {
+    public ServerResponse<?> checkPhone(String value) {
         try {
             userService.checkPhone(value);
         } catch (WiblogException e) {
@@ -157,7 +157,7 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/checkEmail")
-    public ServerResponse checkEmail(String value) {
+    public ServerResponse<?> checkEmail(String value) {
         try {
             userService.checkEmail(value);
         } catch (WiblogException e) {
@@ -166,9 +166,9 @@ public class UserController extends BaseController {
         return ServerResponse.success("手机号校验成功");
     }
 
-    // TODO
+    @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @GetMapping("/getAllUsername")
-    public ServerResponse getAllUsername() {
+    public ServerResponse<?> getAllUsername() {
         return userService.getAllUsername();
     }
 
@@ -182,9 +182,9 @@ public class UserController extends BaseController {
      * @param orderBy  orderBy
      * @return ServerResponse
      */
-    @AuthorizeCheck(grade = "2")
+    @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @PostMapping("/userManageListPage")
-    public ServerResponse userManageListPage(
+    public ServerResponse<?> userManageListPage(
             @RequestParam(value = "state", required = false) Integer state,
             @RequestParam(value = "username", required = false) String username,
             @RequestParam(value = "pageNum", defaultValue = "0") Integer pageNum,
@@ -194,21 +194,21 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/deleteUser")
-    public ServerResponse deleteUser(HttpServletRequest request,Long id) {
+    public ServerResponse<?> deleteUser(HttpServletRequest request, Long id) {
         // 删除自己
-        if (id == null){
+        if (id == null) {
             User user = getLoginUser(request);
             if (user == null) {
                 return ServerResponse.error("用户未登录", 30001);
             }
             return userService.deleteUser(user.getUid());
-        }else{
+        } else {
             // 管理员权限
             String token = WiblogUtil.getCookie(request, Constant.COOKIES_KEY);
             boolean isManager = userRoleService.checkAuthorize(token);
-            if (isManager){
+            if (isManager) {
                 return userService.deleteUser(id);
-            }else{
+            } else {
                 return ServerResponse.error("没有权限", 30001);
             }
         }
@@ -222,14 +222,14 @@ public class UserController extends BaseController {
      * @param code     code
      */
     @GetMapping("/github/callback")
-    public ServerResponse githubLogin(HttpServletRequest request, HttpServletResponse response, String code, String state) throws IOException {
+    public ServerResponse<?> githubLogin(HttpServletRequest request, HttpServletResponse response, String code, String state) throws IOException {
         String accessToken = githubProvider.getAccessToken(code, state);
         Map githubUser = githubProvider.getUser(accessToken);
         if ("login".equals(state)) {
-            User user = githubProvider.registerGithub(githubUser, accessToken);
+            User user = githubProvider.registerGithub(githubUser, accessToken, request);
             // redis缓存
             String token = Md5Util.MD5(request.getSession().getId() + user.getUid().toString());
-            redisTemplate.opsForValue().set(Constant.LOGIN_REDIS_KEY + token, JSON.toJSONString(user), 7, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(Constant.RedisKey.LOGIN_REDIS_KEY + token, JSON.toJSONString(user), 7, TimeUnit.DAYS);
             // cookies
             WiblogUtil.setCookie(response, token);
             // 跳转历史页面
@@ -240,7 +240,7 @@ public class UserController extends BaseController {
         } else {
             User user = getLoginUser(request);
             if (user != null) {
-                ServerResponse serverResponse = githubProvider.bingGithub(user.getUid(), githubUser, accessToken);
+                ServerResponse<?> serverResponse = githubProvider.bingGithub(user.getUid(), githubUser, accessToken);
                 String url = WiblogUtil.getCookie(request, "back");
                 if (!serverResponse.isSuccess()) {
                     WiblogUtil.setCookie(response, "error", serverResponse.getMsg(), 60);
@@ -253,7 +253,7 @@ public class UserController extends BaseController {
 
 
     @GetMapping("/getBindingList")
-    public ServerResponse getBindingList(HttpServletRequest request) {
+    public ServerResponse<?> getBindingList(HttpServletRequest request) {
         User user = getLoginUser(request);
         if (user != null) {
             return userService.getBindingList(user.getUid());
@@ -271,7 +271,7 @@ public class UserController extends BaseController {
      * @return ServerResponse
      */
     @PostMapping("/binding")
-    public ServerResponse binding(HttpServletRequest request, String type, String val, String code) {
+    public ServerResponse<?> binding(HttpServletRequest request, String type, String val, String code) {
         User user = getLoginUser(request);
         if (user != null) {
             return userService.binding(user.getUid(), type, val, code);
@@ -287,7 +287,7 @@ public class UserController extends BaseController {
      * @return ServerResponse
      */
     @PostMapping("/unBinding")
-    public ServerResponse unBinding(HttpServletRequest request, String type) {
+    public ServerResponse<?> unBinding(HttpServletRequest request, String type) {
         User user = getLoginUser(request);
         if (user != null) {
             return userService.unBinding(user.getUid(), type);
@@ -296,16 +296,16 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/setUserDetail")
-    public ServerResponse setUserDetail(HttpServletRequest request,User userNew){
+    public ServerResponse<?> setUserDetail(HttpServletRequest request, User userNew) {
         User user = getLoginUser(request);
         if (user != null) {
-            ServerResponse response = userService.setUserDetail(user.getUid(),userNew);
+            ServerResponse<?> response = userService.setUserDetail(user.getUid(), userNew);
             if (response.isSuccess()) {
                 user.setCity(userNew.getCity());
                 user.setSex(userNew.getSex());
                 user.setIntro(userNew.getIntro());
                 String token = WiblogUtil.getCookie(request, Constant.COOKIES_KEY);
-                redisTemplate.opsForValue().set(Constant.LOGIN_REDIS_KEY + token, JSON.toJSONString(user), 7, TimeUnit.DAYS);
+                redisTemplate.opsForValue().set(Constant.RedisKey.LOGIN_REDIS_KEY + token, JSON.toJSONString(user), 7, TimeUnit.DAYS);
             }
             return response;
         }
@@ -313,15 +313,15 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/setAvatar")
-    public ServerResponse setAvatar(HttpServletRequest request, MultipartFile file){
+    public ServerResponse<?> setAvatar(HttpServletRequest request, MultipartFile file) {
         User user = getLoginUser(request);
         if (user != null) {
-            ServerResponse response = userService.setAvatar(user.getUid(),file);
+            ServerResponse<?> response = userService.setAvatar(user.getUid(), file);
             if (response.isSuccess()) {
                 user.setAvatarImg((String) response.getData());
                 String token = WiblogUtil.getCookie(request, Constant.COOKIES_KEY);
-                log.info("token={}",token);
-                redisTemplate.opsForValue().set(Constant.LOGIN_REDIS_KEY + token, JSON.toJSONString(user), 7, TimeUnit.DAYS);
+                log.info("token={}", token);
+                redisTemplate.opsForValue().set(Constant.RedisKey.LOGIN_REDIS_KEY + token, JSON.toJSONString(user), 7, TimeUnit.DAYS);
             }
             return response;
         }

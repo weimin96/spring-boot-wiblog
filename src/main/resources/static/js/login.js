@@ -5,7 +5,9 @@ let app = new Vue({
     data: {
         account: '',
         password: '',
-        msgError: ''
+        msgError: '',
+        code:"",
+        qrcodeVisable:false
     },
     created(){
         this.init();
@@ -44,7 +46,22 @@ let app = new Vue({
             })
         },
         githubLogin(){
-            window.location.href = "https://github.com/login/oauth/authorize?client_id=9d543dc4501558c6759f&redirect_uri=https://127.0.0.1/u/github/callback&response_type=code&state=login";
+            window.location.href = "https://github.com/login/oauth/authorize?client_id=9d543dc4501558c6759f&redirect_uri=https://www.wiblog.cn/u/github/callback&response_type=code&state=login";
+        },
+        wechatCode(){
+            console.log("验证码"+this.code);
+            $.get("/wx/login",{code:this.code},function (res) {
+                if(res.code===10000){
+                    let url = Cookies.get('back');
+                    if(url !== undefined){
+                        location.href = url;
+                    }else{
+                        location.href = "/";
+                    }
+                }else{
+                    app.$message.error(res.msg);
+                }
+            })
         }
     }
 });

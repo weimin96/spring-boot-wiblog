@@ -1,19 +1,15 @@
 package com.wiblog.core.utils;
 
 import com.wiblog.core.common.Constant;
-
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.util.Random;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import lombok.extern.slf4j.Slf4j;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Random;
 
 /**
  * 图片验证码
@@ -116,8 +112,7 @@ public class VerifyCodeUtils {
         g.setFont(getFont());
         g.setColor(new Color(random.nextInt(101), random.nextInt(111), random
                 .nextInt(121)));
-        String rand = String.valueOf(getRandomString(random.nextInt(randString
-                .length())));
+        String rand = getRandomString(random.nextInt(randString.length()));
         randomString += rand;
         g.translate(random.nextInt(3), random.nextInt(3));
         g.drawString(rand, 13 * i, 16);
@@ -138,7 +133,21 @@ public class VerifyCodeUtils {
     /**
      * 获取随机的字符
      */
-    public static String getRandomString(int num) {
+    private static String getRandomString(int num) {
         return String.valueOf(randString.charAt(num));
+    }
+
+    /**
+     * 生成随机字符串
+     */
+    public static String getRandomCode() {
+        // 绘制随机字符
+        StringBuilder randomString = new StringBuilder();
+        for (int i = 1; i <= stringNum; i++) {
+            String rand = getRandomString(random.nextInt(randString.length()));
+            randomString.append(rand);
+        }
+        System.out.println(randomString.toString());
+        return randomString.toString();
     }
 }
