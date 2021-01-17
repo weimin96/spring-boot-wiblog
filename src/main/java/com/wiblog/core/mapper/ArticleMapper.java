@@ -87,7 +87,7 @@ public interface ArticleMapper extends BaseMapper<Article> {
      * @param likeList likeList
      * @return int
      */
-    int updateLikesBatch(List<Map> likeList);
+    int updateLikesBatch(List likeList);
 
     /**
      * 获取点击数和文章id
@@ -104,4 +104,16 @@ public interface ArticleMapper extends BaseMapper<Article> {
     List<Map<String, Object>> selectLikes();
 
     List<Map> selectListForTitleAndUrl();
+
+    /**
+     * 更新文章点赞数
+     * @param articleId articleId
+     */
+    void updateLikesById(Long articleId);
+
+    /**
+     * 更新文章点击数
+     * @param articleId articleId
+     */
+    void updateHitsById(Long articleId);
 }

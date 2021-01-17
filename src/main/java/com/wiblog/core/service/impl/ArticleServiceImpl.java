@@ -95,6 +95,26 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    public void updateHitsBatch(List<Article> articleList) {
+        articleMapper.updateHitsBatch(articleList);
+    }
+
+    @Override
+    public void updateLikesBatch(List<Article> articleList) {
+        articleMapper.updateLikesBatch(articleList);
+    }
+
+    @Override
+    public void updateLikesById(Long articleId) {
+        articleMapper.updateLikesById(articleId);
+    }
+
+    @Override
+    public void updateHitsById(Long articleId) {
+        articleMapper.updateHitsById(articleId);
+    }
+
+    @Override
     public ServerResponse<ArticleDetailVo> getArticle(String url, User user) {
         ArticleDetailVo detailVo = articleMapper.selectArticleByUrl(url);
         if (detailVo == null) {

@@ -18,6 +18,7 @@ public class MailEvent extends ApplicationEvent {
         super(source);
         this.title = title;
         this.message = message;
+        this.email = email;
     }
 
     @Override

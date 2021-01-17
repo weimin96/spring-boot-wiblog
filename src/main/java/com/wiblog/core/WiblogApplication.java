@@ -17,5 +17,4 @@ public class WiblogApplication {
 		ConfigurableApplicationContext applicationContext = SpringApplication.run(WiblogApplication.class, args);
 		LogWebSocket.setApplicationContext(applicationContext);
 	}
-
 }

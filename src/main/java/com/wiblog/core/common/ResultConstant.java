@@ -47,8 +47,4 @@ public class ResultConstant {
         String REGISTER_ERROR_MSG = "注册失败";
         int REGISTER_ERROR_CODE = 30009;
     }
-
-    public interface Article{
-        String GET_ARTICLE_LIST_SUCCESS = "获取文章列表成功";
-    }
 }

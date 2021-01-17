@@ -16,8 +16,27 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <docker.image.prefix>wiblog</docker.image.prefix>
+    <springboot.version>2.4.0</springboot.version>
+    <elasticsearch.version>7.9.1</elasticsearch.version>
   </properties>
+
+  <!-- 只定义依赖的版本，并不实际依赖 -->
+  <dependencyManagement>
+    <dependencies>
+      <!--spring-boot 开始-->
+      <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter</artifactId>
+        <version>${springboot.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.elasticsearch.client</groupId>
+        <artifactId>elasticsearch-rest-high-level-client</artifactId>
+        <version>${elasticsearch.version}</version>
+      </dependency>
+    </dependencies>
+
+  </dependencyManagement>
 
   <dependencies>
     <!--spring boot-->
@@ -70,8 +89,8 @@
 
     <!--数据库-->
     <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-jdbc</artifactId>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jdbc</artifactId>
     </dependency>
     <!--mysql-->
     <dependency>
@@ -83,13 +102,18 @@
     <dependency>
       <groupId>com.baomidou</groupId>
       <artifactId>mybatis-plus-boot-starter</artifactId>
-      <version>3.1.1</version>
+      <version>3.4.1</version>
     </dependency>
     <!-- https://mvnrepository.com/artifact/com.alibaba/druid-spring-boot-starter -->
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>druid-spring-boot-starter</artifactId>
       <version>1.1.10</version>
+    </dependency>
+    <dependency>
+      <groupId>p6spy</groupId>
+      <artifactId>p6spy</artifactId>
+      <version>3.8.7</version>
     </dependency>
 
     <!--elasticsearch-->
@@ -188,9 +212,16 @@
       <artifactId>thumbnailator</artifactId>
       <version>0.4.8</version>
     </dependency>
-
+    <!-- binlog 日志监听,解析开源工具类库 -->
+    <dependency>
+      <groupId>com.github.shyiko</groupId>
+      <artifactId>mysql-binlog-connector-java</artifactId>
+      <version>0.18.1</version>
+    </dependency>
 
   </dependencies>
+
+
 
   <build>
     <plugins>

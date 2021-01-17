@@ -4,10 +4,6 @@ import com.wiblog.core.entity.User;
 import com.wiblog.core.service.IUserService;
 import com.wiblog.core.utils.MapCache;
 import com.wiblog.core.utils.SpringContextUtil;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 
 import javax.servlet.http.HttpServletRequest;
 

@@ -272,8 +272,9 @@
                 }
                 $.post("/post/record/like", {articleId: this.article.id}, function (res) {
                     if (res.code === 10000) {
-                        that.article.likes = res.data;
+                        that.article.likes = that.article.likes+1;
                         localStorage.setItem("article_" + that.article.id, "1");
+                        that.isLike = "1";
                         that.$message({"message": "点赞成功", "type": "success"});
                     }
                 });
@@ -281,7 +282,7 @@
             hit(){
                 $.post("/post/record/hit", {articleId: this.article.id}, function (res) {
                     if (res.code === 10000) {
-                        that.article.hits = res.data;
+                        that.article.hits = that.article.hits+1;
                     }
                 });
             }

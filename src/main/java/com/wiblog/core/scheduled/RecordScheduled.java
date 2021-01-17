@@ -1,21 +1,27 @@
 package com.wiblog.core.scheduled;
 
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.wiblog.core.common.Constant;
 import com.wiblog.core.entity.Article;
-import com.wiblog.core.mapper.ArticleMapper;
+import com.wiblog.core.service.IArticleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 点赞-点击率定时器
@@ -26,90 +32,87 @@ import java.util.*;
 @Slf4j
 @Component
 @EnableScheduling
+@PropertySource(value = "classpath:/wiblog.properties", encoding = "utf-8")
 public class RecordScheduled {
-
-    @Autowired
-    private ArticleMapper articleMapper;
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
+    @Value("${host-url}")
+    private String hostUrl;
+
+    @Autowired
+    private IArticleService articleService;
+
     /**
-     * 定时更新 article_detail es
+     * 定时更新 article_detail es 排行榜
+     * <p>
+     * // 1.数据显示 直接返回数据库数据
+     * // 2.点击-缓存加一
+     * // 3.定时更新数据库 缓存置0
+     * // 定时更新排行
      */
 //    @Scheduled(cron = "0/10 * * * * ?")
-    @Scheduled(cron = "0 0 */2 * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ?")
     public void recordHit() {
-        // 获取 点击率存入数据库
-        Map<Object, Object> hitMap = redisTemplate.opsForHash().entries(Constant.RedisKey.HIT_RECORD_KEY);
-        // 缓存不存在 将数据库数据导入缓存
-        if (hitMap.isEmpty()) {
-            List<Map<String, Object>> hitList = articleMapper.selectHits();
-            Map<String, Object> hits = new HashMap<>(16);
-            for (Map<String, Object> item : hitList) {
-                hits.put(String.valueOf(item.get("id")), item.get("hits"));
-                // 更新排行榜
-                redisTemplate.opsForZSet().add(Constant.RedisKey.ARTICLE_RANKING_KEY, item.get("id"), Double.parseDouble(item.get("hits").toString()));
-            }
-            redisTemplate.opsForHash().putAll(Constant.RedisKey.HIT_RECORD_KEY, hits);
-        } else {
-            Iterator<Map.Entry<Object, Object>> it = hitMap.entrySet().iterator();
-            List<Map> dataList = new ArrayList<>();
-            while (it.hasNext()) {
-                Map.Entry<Object, Object> itData = it.next();
-                Map<String, Object> data = new HashMap<>(2);
-                data.put("id", itData.getKey());
-                data.put("hits", itData.getValue());
-                dataList.add(data);
-                // 文章排行榜
-                redisTemplate.opsForZSet().add(Constant.RedisKey.ARTICLE_RANKING_KEY, itData.getKey(), Double.parseDouble(itData.getValue().toString()));
+        System.out.println("定时任务");
+        // 点击率 初始化
+        //Map<String, Integer> hitMap = new HashMap<>(16);
+        // 点赞 初始化
+        //Map<String, Integer> likeMap = new HashMap<>(16);
+        // 文章详细信息
+        Map<String, Object> articleDetail = new HashMap<>(16);
 
-            }
-            if (dataList.size() > 0) {
-                articleMapper.updateHitsBatch(dataList);
-            }
-        }
+        // 获取 点击率
+        Map<Object, Object> hitCache = redisTemplate.opsForHash().entries(Constant.RedisKey.HIT_RECORD_KEY);
+        // 获取 点赞数据
+        Map<Object, Object> likeCache = redisTemplate.opsForHash().entries(Constant.RedisKey.LIKE_RECORD_KEY);
 
-        // 点赞存入数据库
-        Map<Object, Object> likeMap = redisTemplate.opsForHash().entries(Constant.RedisKey.LIKE_RECORD_KEY);
-        // 缓存不存在 将数据库数据导入缓存
-        if (likeMap.isEmpty()) {
-            List<Map<String, Object>> likeList = articleMapper.selectLikes();
-            Map<String, Object> likes = new HashMap<>(16);
-            for (Map item : likeList) {
-                likes.put(String.valueOf(item.get("id")), item.get("hits"));
-            }
-            redisTemplate.opsForHash().putAll(Constant.RedisKey.LIKE_RECORD_KEY, likes);
-        } else {
-            Iterator<Map.Entry<Object, Object>> itLike = likeMap.entrySet().iterator();
-            List<Map> likeList = new ArrayList<>();
-            while (itLike.hasNext()) {
-                Map.Entry<Object, Object> itData = itLike.next();
-                Map<String, Object> data = new HashMap<>(2);
-                data.put("id", itData.getKey());
-                data.put("likes", itData.getValue() == null ? 0 : itData.getValue());
-                likeList.add(data);
-            }
-            if (likeList.size() > 0) {
-                articleMapper.updateLikesBatch(likeList);
-            }
-        }
-        // 更新文章缓存信息
+        LambdaQueryWrapper<Article> queryWrapper = new QueryWrapper<Article>().lambda();
+        queryWrapper.select(Article::getId, Article::getTitle, Article::getArticleUrl, Article::getHits, Article::getLikes).eq(Article::getState, "1").eq(Article::getPrivately, "0");
+        List<Article> articleList = articleService.list(queryWrapper);
+        // 合并数据
+        articleList.forEach(it -> {
+            String id = String.valueOf(it.getId());
+            int hit = (Integer) hitCache.get(id) + it.getHits();
+            Integer like = (Integer) likeCache.get(id) + it.getLikes();
+            it.setHits(hit);
+            it.setLikes(like);
+
+            // 更新排行榜
+            redisTemplate.opsForZSet().add(Constant.RedisKey.ARTICLE_RANKING_KEY, id, hit);
+            // 初始化数据
+            //hitMap.put(id, 0);
+            //likeMap.put(id, 0);
+
+            articleDetail.put(id, it);
+        });
+
         redisTemplate.delete(Constant.RedisKey.ARTICLE_DETAIL_KEY);
-        List<Map> list = articleMapper.selectListForTitleAndUrl();
-        for (Map article : list) {
-            redisTemplate.opsForHash().put(Constant.RedisKey.ARTICLE_DETAIL_KEY, String.valueOf(article.get("id")), article);
-        }
+        redisTemplate.opsForHash().putAll(Constant.RedisKey.ARTICLE_DETAIL_KEY, articleDetail);
+        // 点击率 初始化
+        //redisTemplate.opsForHash().putAll(Constant.RedisKey.HIT_RECORD_KEY, hitMap);
+        // 点赞 初始化
+        //redisTemplate.opsForHash().putAll(Constant.RedisKey.LIKE_RECORD_KEY, likeMap);
+
+        // 数据库更新
+//        if (articleList.size() > 0) {
+//            articleService.updateHitsBatch(articleList);
+//            articleService.updateLikesBatch(articleList);
+//        }
 
     }
 
-    @Scheduled(cron = "0 0 */2 * * ?")
+    /**
+     * 定时提交链接给百度站长
+     */
+    @Scheduled(cron = "0 0 1 * * ?")
     public void pushArticle() {
         String api_url = "http://data.zz.baidu.com/urls?site=www.wiblog.cn&token=OesFmLmaNBZXO2G1";
-        List<Article> list = articleMapper.selectList(new QueryWrapper<Article>().eq("state", "1"));
+        List<Article> list = articleService.list(new QueryWrapper<Article>().eq("state", "1"));
         StringBuilder builder = new StringBuilder();
         for (Article article : list) {
-            String url = "https://www.wiblog.cn" + article.getArticleUrl() + "\n";
+            String url = hostUrl + article.getArticleUrl() + "\n";
             builder.append(url);
         }
         HttpHeaders headers = new HttpHeaders();
