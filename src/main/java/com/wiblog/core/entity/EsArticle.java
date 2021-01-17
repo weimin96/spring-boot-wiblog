@@ -1,4 +1,4 @@
-package com.wiblog.core.es;
+package com.wiblog.core.entity;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

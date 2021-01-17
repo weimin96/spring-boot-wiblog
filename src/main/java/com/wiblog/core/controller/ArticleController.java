@@ -12,8 +12,9 @@ import com.wiblog.core.common.Constant;
 import com.wiblog.core.common.RoleEnum;
 import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.Article;
+import com.wiblog.core.entity.EsArticle;
 import com.wiblog.core.entity.User;
-import com.wiblog.core.es.EsArticleRepository;
+import com.wiblog.core.elastic.EsArticleRepository;
 import com.wiblog.core.service.IArticleService;
 import com.wiblog.core.utils.PinYinUtil;
 import com.wiblog.core.utils.WiblogUtil;
@@ -22,18 +23,33 @@ import com.wiblog.core.vo.ArticleDetailVo;
 import com.wiblog.core.vo.ArticlePageVo;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.aggregation.AggregatedPage;
+import org.springframework.data.elasticsearch.core.aggregation.impl.AggregatedPageImpl;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQuery;
+import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
@@ -48,9 +64,8 @@ import java.util.regex.Pattern;
 @RequestMapping("/post")
 public class ArticleController extends BaseController {
 
-    private final RedisTemplate<String, Object> redisTemplate;
 
-    private static final Pattern PATTERN_HIGH_LIGHT = Pattern.compile("<(p)>(.*?)<\\/\\1>");
+    private static final Pattern PATTERN_HIGH_LIGHT = Pattern.compile("<(p)>(.*?)</\\1>");
 
     private final IArticleService articleService;
 
@@ -60,17 +75,12 @@ public class ArticleController extends BaseController {
 
     private final EsArticleRepository articleRepository;
 
-    final
-    ElasticsearchOperations elasticsearchOperations;
-
     @Autowired
-    public ArticleController(IArticleService articleService, RedisTemplate<String, Object> redisTemplate, WordFilterUtil wordFilterUtil, PinYinUtil pinYinUtil, EsArticleRepository articleRepository, ElasticsearchOperations elasticsearchOperations) {
+    public ArticleController(IArticleService articleService, WordFilterUtil wordFilterUtil, PinYinUtil pinYinUtil, EsArticleRepository articleRepository) {
         this.articleService = articleService;
-        this.redisTemplate = redisTemplate;
         this.wordFilterUtil = wordFilterUtil;
         this.pinYinUtil = pinYinUtil;
         this.articleRepository = articleRepository;
-        this.elasticsearchOperations = elasticsearchOperations;
     }
 
     /**
@@ -206,6 +216,11 @@ public class ArticleController extends BaseController {
         return articleService.delArticle(id);
     }
 
+    @Autowired
+    public ElasticsearchOperations elasticsearchOperations;
+
+    @Autowired
+    private ElasticsearchRestTemplate elasticsearchTemplate;
     /**
      * TODO 全文检索
      *
@@ -218,7 +233,9 @@ public class ArticleController extends BaseController {
     public ServerResponse<?> searchArticle(@RequestParam(required = false, defaultValue = "") String keyword,
                                            @RequestParam(required = false, defaultValue = "0") Integer pageNum,
                                            @RequestParam(required = false, defaultValue = "10") Integer pageSize) {
+        List<EsArticle> resultList = new ArrayList<>();
         keyword = keyword.trim();
+
         Pageable pageable = PageRequest.of(pageNum, pageSize);
         //高亮拼接的前缀
         String preTags = "<p>";
@@ -227,15 +244,42 @@ public class ArticleController extends BaseController {
         //查询具体的字段
         String[] fieldNames = {"title", "content"};
         //创建queryBuilder查询条件
-        /*QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(keyword, fieldNames);
+        QueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(keyword, fieldNames);
         //创建search对象
-        SearchQuery query = new NativeSearchQueryBuilder().withQuery(queryBuilder).withHighlightFields(
+        NativeSearchQuery query = new NativeSearchQueryBuilder().withQuery(queryBuilder).withHighlightFields(
                 new HighlightBuilder.Field(fieldNames[0]).preTags(preTags).postTags(postTags),
                 new HighlightBuilder.Field(fieldNames[1]).preTags(preTags).postTags(postTags)
         ).withPageable(pageable).build();
-        elasticsearchOperations.multiSearch()
-        //执行分页查询
-        Page<EsArticle> page = .queryForPage(query,EsArticle.class,new SearchResultMapper(){
+        //查询
+        SearchHits<EsArticle> searchHits = elasticsearchTemplate.search(query,EsArticle.class);
+
+        // 获取搜索到的数据
+        for (SearchHit<EsArticle> searchHit : searchHits) {
+            Map<String, List<String>> highlightFields = searchHit.getHighlightFields();
+            EsArticle esArticle = searchHit.getContent();
+            // 匹配到的字段
+            for (Map.Entry<String, List<String>> stringHighlightFieldEntry : highlightFields.entrySet()) {
+                String key = stringHighlightFieldEntry.getKey();
+                if (fieldNames[1].equals(key)){
+                    String value = esArticle.getContent();
+                    // 截取部分内容
+                    Matcher mt = PATTERN_HIGH_LIGHT.matcher(value);
+                    if (mt.find()){
+                        int mtStart = mt.start();
+                        int start = Math.max(mtStart - 100, 0);
+                        int end = Math.min(mtStart+300,value.length()-1);
+                        value = value.substring(start,end);
+                    }else {
+                        value = value.substring(0,Math.min(300,value.length()-1));
+                    }
+                    esArticle.setContent(value);
+                }
+            }
+            resultList.add(esArticle);
+        }
+
+
+        /*new SearchResultMapper(){
             @Override
             public <T> AggregatedPage<T> mapResults(SearchResponse response, Class<T> aClass, Pageable pageable) {
                 List<EsArticle> list = new ArrayList<>();
@@ -288,7 +332,7 @@ public class ArticleController extends BaseController {
             }
         });*/
 
-        return ServerResponse.success(null);
+        return ServerResponse.success(resultList);
     }
 
 
@@ -300,22 +344,14 @@ public class ArticleController extends BaseController {
      */
     @PostMapping("/record/like")
     public ServerResponse<Integer> like(Long articleId) {
-        Integer count;
-        count = (Integer) redisTemplate.opsForHash().get(Constant.RedisKey.LIKE_RECORD_KEY, articleId + "");
-        if (count == null) {
-            Article article = articleService.getById(articleId);
-            if (article == null) {
-                return ServerResponse.error("不存在该文章", 30001);
-            }
-            count = article.getHits();
-        }
-        redisTemplate.opsForHash().put(Constant.RedisKey.LIKE_RECORD_KEY, String.valueOf(articleId), ++count);
-
-        return ServerResponse.success(count);
+        //redisTemplate.opsForHash().increment(Constant.RedisKey.LIKE_RECORD_KEY, String.valueOf(articleId), 1);
+        articleService.updateLikesById(articleId);
+        return ServerResponse.success(null);
     }
 
     /**
      * 点击率记录
+     * 点击-缓存加一
      *
      * @param articleId articleId
      * @return ServerResponse
@@ -323,25 +359,16 @@ public class ArticleController extends BaseController {
     @PostMapping("/record/hit")
     public ServerResponse<Integer> hit(HttpServletRequest request, HttpServletResponse response, Long articleId) {
         String check = WiblogUtil.getCookie(request, "article_" + articleId);
-
-        Integer count;
-        count = (Integer) redisTemplate.opsForHash().get(Constant.RedisKey.HIT_RECORD_KEY, articleId + "");
-        if (count == null) {
-            Article article = articleService.getById(articleId);
-            if (article == null) {
-                return ServerResponse.error("不存在该文章", 30001);
-            }
-            count = article.getHits();
-
-        }
+        // 已经点过
         if (StringUtils.isNotBlank(check)) {
-            return ServerResponse.success(count);
+            return ServerResponse.success(null);
         }
-        redisTemplate.opsForHash().put(Constant.RedisKey.HIT_RECORD_KEY, String.valueOf(articleId), ++count);
+        articleService.updateHitsById(articleId);
+        // 加一
+        //redisTemplate.opsForHash().increment(Constant.RedisKey.HIT_RECORD_KEY, String.valueOf(articleId),1);
         // cookie保留2小时
         WiblogUtil.setCookie(response, "article_" + articleId, "1", 60 * 60 * 2);
-
-        return ServerResponse.success(count);
+        return ServerResponse.success(null);
     }
 
     /**

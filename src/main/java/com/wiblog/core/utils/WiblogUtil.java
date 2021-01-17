@@ -1,5 +1,6 @@
 package com.wiblog.core.utils;
 
+import com.vdurmont.emoji.EmojiParser;
 import com.wiblog.core.common.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -41,8 +42,20 @@ public class WiblogUtil {
         Node document = PARSER.parse(markdown);
 
         String content = RENDERER.render(document);
-        content = Commons.emoji(content);
+        content = emoji(content);
         return content;
+    }
+
+    /**
+     * An :grinning:awesome :smiley:string &#128516;with a few :wink:emojis!
+     * <p>
+     * 这种格式的字符转换为emoji表情
+     *
+     * @param value
+     * @return
+     */
+    public static String emoji(String value) {
+        return EmojiParser.parseToUnicode(value);
     }
 
 

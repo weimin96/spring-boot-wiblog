@@ -1,5 +1,6 @@
-package com.wiblog.core.es;
+package com.wiblog.core.elastic;
 
+import com.wiblog.core.entity.EsArticle;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 
 /**

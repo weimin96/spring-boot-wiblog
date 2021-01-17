@@ -66,6 +66,16 @@ public class Constant {
      */
     public interface RedisKey{
 
+        /**
+         * 是否初始化数据缓存
+         */
+        String APP_INIT = "app_init";
+
+        /**
+         * 是否初始化数据缓存
+         */
+        String ELASTIC_SEARCH_INIT = "elastic_search_init";
+
         String LOGIN_REDIS_KEY = "user_login_";
         /**
          * redis key 前缀 邮箱验证码

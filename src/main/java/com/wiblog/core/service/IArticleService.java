@@ -8,6 +8,8 @@ import com.wiblog.core.entity.User;
 import com.wiblog.core.vo.ArticleDetailVo;
 import com.wiblog.core.vo.ArticlePageVo;
 
+import java.util.List;
+
 /**
  * 服务类
  *
@@ -58,4 +60,28 @@ public interface IArticleService extends IService<Article> {
      * @return ServerResponse
      */
     ServerResponse<?> getArticleRank();
+
+    /**
+     * 批量更新点击数
+     * @param articleList articleList
+     */
+    void updateHitsBatch(List<Article> articleList);
+
+    /**
+     * 批量更新点赞数
+     * @param articleList articleList
+     */
+    void updateLikesBatch(List<Article> articleList);
+
+    /**
+     * 更新文章点赞数
+     * @param articleId articleId
+     */
+    void updateLikesById(Long articleId);
+
+    /**
+     * 更新文章点击数
+     * @param articleId articleId
+     */
+    void updateHitsById(Long articleId);
 }

@@ -104,7 +104,7 @@ public class MailServiceImpl implements IMailService {
         query.eq(Article::getId, comment.getArticleId());
         Article article = articleService.getOne(query);
         // 回复评论
-        if (comment.getParentId() != null) {
+        if (comment.getParentId() != 0) {
             // 查找被评论人
             LambdaQueryWrapper<Comment> queryWrapper = new QueryWrapper<Comment>().lambda();
             queryWrapper.eq(Comment::getId, comment.getParentId());

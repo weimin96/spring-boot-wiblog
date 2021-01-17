@@ -126,4 +126,12 @@ id,uid, author, title, content, tags, category_id, img_url, article_url, article
     <select id="selectListForTitleAndUrl" resultType="java.util.Map">
         select id,title,article_url as url from article where state = 1
     </select>
+
+    <update id="updateLikesById">
+        update article set likes = likes + 1 where id = #{articleId}
+    </update>
+
+    <update id="updateHitsById">
+        update article set hits = hits + 1 where id = #{articleId}
+    </update>
 </mapper>
