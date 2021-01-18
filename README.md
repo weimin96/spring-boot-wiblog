@@ -1,7 +1,9 @@
 # 基于spring boot的博客网站
 
 ![maven](https://img.shields.io/maven-central/v/org.apache.maven/apache-maven)
-![GitHub](https://img.shields.io/github/license/weimin96/spring-boot-wiblog)
+![license](https://img.shields.io/github/license/weimin96/spring-boot-wiblog)
+![Spring%20Boot](https://img.shields.io/badge/Spring%20Boot-2.4.0-green)
+![Author](https://img.shields.io/badge/Author-@weimin96-yellowgreen)
 
 线上地址：[https://www.wiblog.cn/](https://www.wiblog.cn/)
 
@@ -47,12 +49,37 @@
 
 spring boot 、spring-mvc 、mybatis-plus 、mysql、redis 、elasticsearch、thymeleaf、vue、element-ui
 
-## 环境搭建
+## 开发环境
 
-1. 运行`myblog.sql`导入数据库（`\src\main\resources\myblog.sql`）
-2. 配置`\src\main\resources\application-dev.properties`（配置服务器ip/数据库账号密码）
-3. 配置`\src\main\resources\wiblog.properties`（图片存储/公众号/github第三方登录）
-4. 打包运行（maven、java环境）
+### 软件工具
+
+- JDK: 1.8
+- Maven: 3.3+
+- MySql: 5.6+ [安装教程](./doc/mysql.md)
+- Redis: 4.0+ [安装教程](./doc/Redis.md)
+- elasticSearch 7.x [安装教程](./doc/elasticSearch.md)
+
+### IDE插件
+
+- Lombok Plugin
+
+## 工程导入
+
+### 使用git导入工程
+```
+git clone https://github.com/weimin96/spring-boot-wiblog.git
+```
+### 创建数据库
+
+打开Navicat（此处可以选择其他的客户端）-> 连接数据库 ->  运行sql文件 -> 选择 `\src\main\resources\myblog.sql`
+
+### 修改配置文件
+
+配置`\src\main\resources\application-dev.properties`（配置服务器ip/数据库账号密码/elasticsearch ip地址）
+
+配置`\src\main\resources\wiblog.properties`（腾讯云密钥图片存储/公众号/github第三方登录）
+
+### 打包运行
 ```
 # 打包
 mvn clean package
@@ -65,7 +92,3 @@ java -jar target\core-0.0.1-SNAPSHOT.jar
 后台管理地址 http://127.0.0.1:8080/admin
 
 默认管理员账号为：admin / 123456
-
-## License
-
-Apache Dubbo software is licenced under the Apache License Version 2.0. See the [LICENSE](https://github.com/apache/dubbo/blob/master/LICENSE) file for details.
