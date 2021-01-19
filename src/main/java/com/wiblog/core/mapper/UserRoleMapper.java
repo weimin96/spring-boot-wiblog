@@ -22,7 +22,7 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
      * @param uid uid
      * @return List
      */
-    RoleVo selectRoleByUid(Long uid);
+    List<RoleVo> selectRoleByUid(Long uid);
 
     /**
      * 查找权限类别
