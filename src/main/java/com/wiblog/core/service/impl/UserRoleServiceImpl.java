@@ -54,7 +54,7 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
 
     @Override
     public ServerResponse<?> getUserRole(Long uid) {
-        RoleVo role = userRoleMapper.selectRoleByUid(uid);
+        List<RoleVo> role = userRoleMapper.selectRoleByUid(uid);
         return ServerResponse.success(role);
     }
 
@@ -69,12 +69,15 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
         if (user == null) {
             return ServerResponse.error("用户未登录", 40000);
         }
-        RoleVo roleVo = userRoleMapper.selectRoleByUid(user.getUid());
-        if (roleVo != null) {
-            RoleEnum role = RoleEnum.toName(roleVo.getRoleId().intValue());
-            if (grade.getValue() == role.getValue()) {
-                return ServerResponse.success(null, "权限校验成功");
+        List<RoleVo> roleVoList = userRoleMapper.selectRoleByUid(user.getUid());
+        if (roleVoList != null) {
+            for (RoleVo roleVo : roleVoList) {
+                RoleEnum role = RoleEnum.toName(roleVo.getRoleId().intValue());
+                if (grade.getValue() == role.getValue()) {
+                    return ServerResponse.success(null, "权限校验成功");
+                }
             }
+
         }
         return ServerResponse.error("没有权限", 40000);
     }
