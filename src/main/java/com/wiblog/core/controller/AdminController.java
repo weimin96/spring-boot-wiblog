@@ -1,5 +1,6 @@
 package com.wiblog.core.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.tencentcloudapi.monitor.v20180724.models.GetMonitorDataResponse;
 import com.wiblog.core.aop.AuthorizeCheck;
@@ -7,20 +8,20 @@ import com.wiblog.core.common.RoleEnum;
 import com.wiblog.core.common.ServerResponse;
 import com.wiblog.core.entity.Article;
 import com.wiblog.core.entity.Comment;
+import com.wiblog.core.entity.Ops;
 import com.wiblog.core.entity.User;
-import com.wiblog.core.scheduled.RecordScheduled;
 import com.wiblog.core.service.IArticleService;
 import com.wiblog.core.service.ICommentService;
 import com.wiblog.core.service.IOpsService;
 import com.wiblog.core.service.IUserService;
 import com.wiblog.core.thirdparty.MonitorData;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,9 +57,9 @@ public class AdminController {
     @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @PostMapping("/getMonitorData")
     public ServerResponse<?> getMonitorData(String metric, Integer period, Date startTime, Date endTime) {
-        GetMonitorDataResponse res = monitorData.getMonitorData(metric,period,startTime,endTime);
-        if (res == null || res.getDataPoints()==null){
-            return ServerResponse.error("获取监控数据失败",30001);
+        GetMonitorDataResponse res = monitorData.getMonitorData(metric, period, startTime, endTime);
+        if (res == null || res.getDataPoints() == null) {
+            return ServerResponse.error("获取监控数据失败", 30001);
         }
         return ServerResponse.success(res);
     }
@@ -69,15 +70,27 @@ public class AdminController {
     @AuthorizeCheck(grade = RoleEnum.ADMIN)
     @GetMapping("/getStaticData")
     public ServerResponse<?> getStaticData() {
-        int userCount = userService.count(new QueryWrapper<User>().eq("state","1"));
-        int articleCount = articleService.count(new QueryWrapper<Article>().eq("state","1"));
-        int commentCount = commentService.count(new QueryWrapper<Comment>().eq("state","1"));
-        Map<String,Object> result =  new HashMap<>(5);
-        result.put("userCount",userCount);
-        result.put("articleCount",articleCount);
-        result.put("commentCount",commentCount);
-        result.put("hitCount",0);
-        result.put("profitCount",0);
+        int userCount = userService.count(new QueryWrapper<User>().eq("state", "1"));
+        int articleCount = articleService.count(new QueryWrapper<Article>().eq("state", "1"));
+        int commentCount = commentService.count(new QueryWrapper<Comment>().eq("state", "1"));
+        Map<String, Object> result = new HashMap<>(5);
+        result.put("userCount", userCount);
+        result.put("articleCount", articleCount);
+        result.put("commentCount", commentCount);
+        result.put("hitCount", 0);
+        result.put("profitCount", 0);
         return ServerResponse.success(result);
+    }
+
+    /**
+     * 获取管理员操作日志
+     */
+    @AuthorizeCheck(grade = RoleEnum.ADMIN)
+    @GetMapping("/getOpsData")
+    public ServerResponse<?> getOpsData() {
+        LambdaQueryWrapper<Ops> queryWrapper = new QueryWrapper<Ops>().lambda();
+        queryWrapper.orderByDesc(Ops::getCreateTime).last("limit 10");
+        List<Ops> list = opsService.list(queryWrapper);
+        return ServerResponse.success(list);
     }
 }
