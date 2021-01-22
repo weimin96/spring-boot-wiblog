@@ -58,9 +58,9 @@ public class UserController extends BaseController {
 
     @PostMapping("/login")
     public ServerResponse<?> login(String account, String password, HttpServletRequest request, HttpServletResponse response) {
-        System.out.println("登录");
+        String key = IPUtil.getIpAddr(request) + "_" + account;
         // 错误次数
-        Integer errorCount = cache.get("login_error_count");
+        Integer errorCount = (Integer) redisTemplate.opsForValue().get(Constant.RedisKey.LOGIN_ERROR_KEY + key);
         ServerResponse<User> serverResponse;
         try {
             serverResponse = userService.login(account, password);
@@ -81,7 +81,7 @@ public class UserController extends BaseController {
             if (errorCount > 3) {
                 return ServerResponse.error("您输入密码已经错误超过3次，请10分钟后尝试", 10005);
             }
-            cache.set("login_error_count", errorCount, 10 * 60);
+            redisTemplate.opsForValue().set(key, errorCount, 600, TimeUnit.SECONDS);
             String msg = "登录失败";
             if (e instanceof WiblogException) {
                 msg = e.getMessage();

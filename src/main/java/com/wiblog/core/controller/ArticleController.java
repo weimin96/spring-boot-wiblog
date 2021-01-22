@@ -65,7 +65,7 @@ import java.util.regex.Pattern;
 public class ArticleController extends BaseController {
 
 
-    private static final Pattern PATTERN_HIGH_LIGHT = Pattern.compile("<(p)>(.*?)</\\1>");
+    private static final Pattern PATTERN_HIGH_LIGHT = Pattern.compile(Constant.Regular.HIGH_LIGHT);
 
     private final IArticleService articleService;
 

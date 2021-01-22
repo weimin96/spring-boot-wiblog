@@ -2,7 +2,6 @@ package com.wiblog.core.common;
 
 import com.wiblog.core.entity.User;
 import com.wiblog.core.service.IUserService;
-import com.wiblog.core.utils.MapCache;
 import com.wiblog.core.utils.SpringContextUtil;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
  * @date 2019/7/3
  */
 public abstract class BaseController {
-
-    protected MapCache cache = MapCache.single();
 
     /**
      * 获取登录用户信息
