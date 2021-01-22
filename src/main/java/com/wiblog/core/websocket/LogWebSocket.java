@@ -27,7 +27,6 @@ import java.util.concurrent.*;
 @Slf4j
 public class LogWebSocket {
 
-    private static ApplicationContext applicationContext;
     private static IUserRoleService userRoleService;
 
     private static ThreadFactory threadFactory = new BasicThreadFactory.Builder().namingPattern("cache-pool-%d")
@@ -66,8 +65,14 @@ public class LogWebSocket {
             onClose();
         } else {
             try {
-            process = Runtime.getRuntime().exec("tail -f /home/pwm/log/log.log");
-//                process = Runtime.getRuntime().exec("cmd /c powershell Get-Content E:\\桌面\\log.log -Wait");
+                String dir = System.getProperty("user.dir")+"/log/log.log";
+                String os = System.getProperty("os.name");
+                if(os.toLowerCase().startsWith("win")){
+                    process = Runtime.getRuntime().exec("cmd /c powershell Get-Content "+dir);
+                }else{
+                    process = Runtime.getRuntime().exec("tail -f "+dir);
+                }
+
                 inputStream = process.getInputStream();
 
                 // 一定要启动新的线程，防止InputStream阻塞处理WebSocket的线程
@@ -149,7 +154,6 @@ public class LogWebSocket {
 
 
     public static void setApplicationContext(ApplicationContext context) {
-        applicationContext = context;
-        userRoleService = applicationContext.getBean(IUserRoleService.class);
+        userRoleService = context.getBean(IUserRoleService.class);
     }
 }
