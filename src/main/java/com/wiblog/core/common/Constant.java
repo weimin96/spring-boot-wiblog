@@ -59,6 +59,11 @@ public class Constant {
          * 换行 tab 空格
          */
         String WRAP = "\\s*|\t|\r|\n";
+
+        /**
+         * 高亮
+         */
+        String HIGH_LIGHT = "<(p)>(.*?)</\\1>";
     }
 
     /**
@@ -77,6 +82,11 @@ public class Constant {
         String ELASTIC_SEARCH_INIT = "elastic_search_init";
 
         String LOGIN_REDIS_KEY = "user_login_";
+
+        /**
+         * 登录失败次数
+         */
+        String LOGIN_ERROR_KEY = "login_error_count_";
         /**
          * redis key 前缀 邮箱验证码
          */
