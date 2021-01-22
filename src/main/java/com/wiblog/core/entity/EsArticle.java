@@ -1,8 +1,10 @@
 package com.wiblog.core.entity;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.annotations.Field;
@@ -20,6 +22,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @Document(indexName = "article")
+@Accessors(chain = true)
 public class EsArticle  implements Serializable {
     private static final long serialVersionUID = -7577471814974481136L;
 
