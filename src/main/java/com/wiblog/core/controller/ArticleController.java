@@ -73,14 +73,14 @@ public class ArticleController extends BaseController {
 
     private final PinYinUtil pinYinUtil;
 
-    private final EsArticleRepository articleRepository;
+    private final ElasticsearchRestTemplate elasticsearchTemplate;
 
     @Autowired
-    public ArticleController(IArticleService articleService, WordFilterUtil wordFilterUtil, PinYinUtil pinYinUtil, EsArticleRepository articleRepository) {
+    public ArticleController(IArticleService articleService, WordFilterUtil wordFilterUtil, PinYinUtil pinYinUtil, ElasticsearchRestTemplate elasticsearchTemplate) {
         this.articleService = articleService;
         this.wordFilterUtil = wordFilterUtil;
         this.pinYinUtil = pinYinUtil;
-        this.articleRepository = articleRepository;
+        this.elasticsearchTemplate = elasticsearchTemplate;
     }
 
     /**
@@ -216,11 +216,6 @@ public class ArticleController extends BaseController {
         return articleService.delArticle(id);
     }
 
-    @Autowired
-    public ElasticsearchOperations elasticsearchOperations;
-
-    @Autowired
-    private ElasticsearchRestTemplate elasticsearchTemplate;
     /**
      * TODO 全文检索
      *
@@ -334,6 +329,8 @@ public class ArticleController extends BaseController {
 
         return ServerResponse.success(resultList);
     }
+
+
 
 
     /**
