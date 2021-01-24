@@ -5,8 +5,10 @@ import com.wiblog.core.service.IMailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.Resource;
+import java.util.concurrent.ExecutorService;
 
 /**
  * @author pwm
@@ -19,10 +21,14 @@ public class CommentListener implements ApplicationListener<CommentEvent> {
     @Autowired
     private IMailService mailService;
 
-    @Async
+    @Resource(name = "taskExecutor")
+    private ExecutorService executorService;
+
     @Override
     public void onApplicationEvent(CommentEvent commentEvent) {
         log.info("接收到评论");
-        mailService.commentNotice(commentEvent.getComment());
+        executorService.execute(()->{
+            mailService.commentNotice(commentEvent.getComment());
+        });
     }
 }

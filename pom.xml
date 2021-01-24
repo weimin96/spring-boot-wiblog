@@ -234,6 +234,13 @@
           <includeSystemScope>true</includeSystemScope>
         </configuration>
       </plugin>
+
+      <!--在这里修改版本-->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.4.3</version>
+      </plugin>
     </plugins>
   </build>
 
