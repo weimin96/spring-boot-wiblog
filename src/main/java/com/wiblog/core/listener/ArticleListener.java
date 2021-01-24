@@ -7,16 +7,17 @@ import com.wiblog.core.entity.EsArticle;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * 监听article表的变化，更新elasticsearch
@@ -45,9 +46,12 @@ public class ArticleListener {
     @Autowired
     EsArticleRepository articleRepository;
 
-    @PostConstruct
-    public void onListener() throws IOException {
+    @Resource(name = "taskExecutor")
+    private ExecutorService executorService;
 
+    @PostConstruct
+    public void onListener() {
+        log.info("监听数据库初始化");
         // 获取监听数据表数组
         List<String> databaseList = Collections.singletonList(TABLE_NAME);
         Map<Long, String> tableMap = new HashMap<>(8);
@@ -104,7 +108,16 @@ public class ArticleListener {
             }
         });
 
-        client.connect();
+        onEventStart(client);
+    }
 
+    public void onEventStart(BinaryLogClient client) {
+        executorService.execute(() -> {
+            try {
+                client.connect();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+            }
+        });
     }
 }
