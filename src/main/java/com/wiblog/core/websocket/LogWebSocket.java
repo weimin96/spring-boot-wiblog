@@ -65,10 +65,10 @@ public class LogWebSocket {
             onClose();
         } else {
             try {
-                String dir = System.getProperty("user.dir")+"/log/log.log";
+                String dir = System.getProperty("user.dir")+"/logs/log.log";
                 String os = System.getProperty("os.name");
                 if(os.toLowerCase().startsWith("win")){
-                    process = Runtime.getRuntime().exec("cmd /c powershell Get-Content "+dir);
+                    process = Runtime.getRuntime().exec("cmd /c powershell Get-Content "+"'"+dir+"'");
                 }else{
                     process = Runtime.getRuntime().exec("tail -f "+dir);
                 }
@@ -148,7 +148,7 @@ public class LogWebSocket {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        log.error("关闭socket异常", error);
+        //log.error("关闭socket异常", error);
         onClose();
     }
 

@@ -23,11 +23,6 @@ public class Constant {
     public static final String IP_BAIDU_URL = "http://opendata.baidu.com/api.php?co=&resource_id=6006&t=1433920989928&ie=utf8&oe=utf-8&format=json&query=";
 
     /**
-     * 日志列表
-     */
-    public static final String LOG_PATH = "/home/pwm/log/";
-
-    /**
      * 正则
      */
     public interface Regular{

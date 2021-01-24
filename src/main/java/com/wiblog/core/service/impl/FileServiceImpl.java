@@ -143,7 +143,7 @@ public class FileServiceImpl implements IFileService {
     public ServerResponse<?> getLogList() {
         List<Map<String, Object>> fileList = new ArrayList<>();
         try {
-            File file = new File(Constant.LOG_PATH);
+            File file = new File(System.getProperty("user.dir")+"/logs");
             File[] files = file.listFiles();
             if (files == null){
                 return ServerResponse.success(null, "文件不存在，请检查文件路径");
