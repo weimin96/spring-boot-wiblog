@@ -67,3 +67,21 @@ ul{
     color: #333!important;
 }
 
+.scroll-list{
+    height: 300px;
+    overflow: hidden;
+}
+
+.scroll-list span{
+    padding-right: 10px;
+    display: inline-block;
+}
+
+.scroll-list span:first-child{
+    width: 55px;
+}
+
+.scroll-list span:nth-child(2){
+    width: 200px;
+}
+

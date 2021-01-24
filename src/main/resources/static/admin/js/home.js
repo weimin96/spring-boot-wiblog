@@ -21,7 +21,12 @@ $(function () {
             period: 60*60,
             type: 3,
             // 访问信息图表
-            hitChart:{}
+            hitChart:{},
+
+            boxHeight:0,
+            windowResize:0,
+            timer:null,
+            opsList:[]
         },
         beforeCreate() {
             vm = this;
@@ -30,6 +35,11 @@ $(function () {
             this.getStaticData();
             this.initSysChart();
             this.chooseType(this.type);
+            this.initOpsList();
+            this.windowResize = this.boxHeight = this.$refs.scrollList.offsetHeight
+            this.boxHeight = this.$refs.scrollList.offsetHeight
+            // window.addEventListener('resize', this.windowResize)
+            this.getList();
         },
         methods: {
             // 获取统计信息
@@ -227,6 +237,56 @@ $(function () {
             // 初始化访问信息图表
             initHitChart(){
                 this.hitChart = echarts.init(document.getElementById('hitChart'));
+            },
+            // 自动滚动动画效果
+            scrollFn() {
+                this.timer = setInterval(() => {
+                    if (this.$refs.scrollList.scrollTop + this.boxHeight === this.$refs.scrollList.scrollHeight) {
+                        this.$refs.scrollList.scrollTop = 0
+                    } else {
+                        this.$refs.scrollList.scrollTop += 1
+                    }
+                }, 50)
+            },
+            getList(){
+                clearInterval(this.timer)
+                this.$nextTick(() => {
+                    this.scrollFn()
+                })
+            },
+            // 清除滚动效果定时器
+            clearTimer() {
+                clearInterval(this.timer)
+            },
+            initOpsList(){
+                $.get("/getOpsData",function (res) {
+                    if (res.code === 10000){
+                        vm.opsList = res.data;
+                    }
+                })
+            }
+        },
+        beforeDestroy() {
+            if (this.timer) {
+                this.clearTimer()
+            }
+        },
+        filters: {
+            dateFormat: function (d) {
+                var date = new Date(d);
+                var year = date.getFullYear();
+                var month = change(date.getMonth()+1);
+                var day = change(date.getDate());
+
+                function change(t) {
+                    if (t < 10) {
+                        return "0" + t;
+                    } else {
+                        return t;
+                    }
+                }
+
+                return year+"-"+month + "-" + day;
             }
         }
     });

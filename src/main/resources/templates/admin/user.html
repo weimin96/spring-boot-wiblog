@@ -78,9 +78,16 @@
 
         <el-dialog title="用户授权" :visible.sync="roleDialogVisible" width="50%">
             <template>
-                <el-radio-group v-model="userRoleId" v-for="item in roleList">
+                <!--<el-radio-group v-model="userRoleId" v-for="item in roleList">
                     <el-radio style="" :label="item.roleId">{{item.name}}</el-radio>
-                </el-radio-group>
+                </el-radio-group>-->
+                <el-transfer
+                        v-model="userRoleIds"
+                        :data="roleList"
+                        :titles="['所有权限','拥有权限']"
+                        :button-texts="['撤销', '授权']">
+
+                </el-transfer>
                 <span slot="footer" class="dialog-footer">
                     <el-button @click="roleDialogVisible = false">取 消</el-button>
                     <el-button type="primary" @click="roleDialogEnter">确 定</el-button>
