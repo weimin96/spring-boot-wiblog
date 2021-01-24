@@ -34,10 +34,13 @@
                width="60%"
                :show-close="false">
         <template>
-            <p v-for="it in logDetail">{{it}}</p>
-            <el-button @click="pageUp()">上一页</el-button>
-            <el-button @click="pageDown()">下一页</el-button>
-            <span>总数：{{total}}</span>
+            <div style="height: 400px;overflow: auto">
+                <p v-for="it in logDetail">{{it}}</p>
+                <el-button @click="pageUp()">上一页</el-button>
+                <el-button @click="pageDown()">下一页</el-button>
+                <span>总数：{{total}}</span>
+            </div>
+
         </template>
 
     </el-dialog>

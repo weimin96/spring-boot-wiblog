@@ -31,15 +31,7 @@ let app = new Vue({
             $.get("/getLogList", function (res) {
                 if (res.code === 10000) {
 
-                    vm.logList = [{name: "log.2020-04-15.0.log", path: "/home/pwm/log/log.2020-04-15.0.log"},
-                    {name: "log.2020-04-05.0.log", path: "/home/pwm/log/log.2020-04-05.0.log"},
-                    {name: "log.2020-03-31.0.log", path: "/home/pwm/log/log.2020-03-31.0.log"},
-                    {name: "log.log", path: "/home/pwm/log/log.log"},
-                    {name: "log.2020-04-06.0.log", path: "/home/pwm/log/log.2020-04-06.0.log"},
-                    {name: "log.2020-03-21.0.log", path: "/home/pwm/log/log.2020-03-21.0.log"},
-                    {name: "log.2020-04-13.0.log", path: "/home/pwm/log/log.2020-04-13.0.log"},
-                    {name: "log.2020-04-16.0.log", path: "/home/pwm/log/log.2020-04-16.0.log"},
-                    ]//res.data;
+                    vm.logList = res.data;
 
                 }
             })
@@ -85,8 +77,16 @@ let app = new Vue({
         },
         createWebsocket() {
             let token = this.$cookies.get("uToken");
-            this.websocket = new WebSocket('wss://www.wiblog.cn/websocket/log/' + token);
-            // this.websocket = new WebSocket('wss://127.0.0.1/websocket/log/'+token);
+            let host = window.location.host;
+            // wss/ws
+            let protocol;
+            alert(window.location.protocol)
+            if (window.location.protocol === "http:"){
+                protocol = "ws"
+            }else{
+                protocol = "wss"
+            }
+            this.websocket = new WebSocket(protocol+'://'+host+'/websocket/log/' + token);
             this.websocket.onopen = this.open;
             this.websocket.onmessage = this.onmessage;
         },
