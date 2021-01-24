@@ -15,10 +15,10 @@ let app = new Vue({
     methods: {
         getSearchData(){
             let key = getQueryVariable("key");
+            this.searchVal = key;
             $.get("/post/searchArticle",{keyword:key},function (res) {
                 if (res.code===10000){
-                    vm.contentList=res.data.content;
-
+                    vm.contentList = res.data;
                 }
             })
         },
@@ -26,7 +26,6 @@ let app = new Vue({
             $.get("/category/getCategory", function (data) {
                 if (data.code === 10000) {
                     $.each(data.data,(index,item) => {
-                        console.log(item);
                         vm.category[item.id]=item.name;
                     });
                     vm.getSearchData()
