@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 
 /**
@@ -48,14 +49,14 @@ public class UserRoleController extends BaseController {
      *
      * @param request request
      * @param uid     用户id
-     * @param roleId  角色id
+     * @param roleIds  角色id
      * @return ServerResponse
      */
     @AuthorizeCheck(grade = RoleEnum.SUPER_ADMIN)
     @PostMapping("/assignPermission")
-    public ServerResponse<?> assignPermission(HttpServletRequest request, Long uid, Long roleId) {
+    public ServerResponse<?> assignPermission(HttpServletRequest request, Long uid, Long[] roleIds) {
         User user = getLoginUser(request);
-        return userRoleService.assignPermission(user, uid, roleId);
+        return userRoleService.assignPermission(user, uid, roleIds);
     }
 
     /**

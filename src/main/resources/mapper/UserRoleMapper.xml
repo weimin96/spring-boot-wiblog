@@ -24,4 +24,13 @@
     <select id="selectRole" resultType="com.wiblog.core.vo.RoleVo">
         select id as roleId,name from role;
     </select>
+
+    <insert id="insertBatch">
+        insert into user_role
+        (uid,role_id)
+        values
+        <foreach collection="ids" item="item" separator=",">
+            (#{uid},#{item})
+        </foreach>
+    </insert>
 </mapper>

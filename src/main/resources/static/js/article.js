@@ -108,7 +108,13 @@
                         that.navList.push(item);
                         navIndex++;
                     } else {
-                        that.navList[navIndex].children.push(item)
+                        if (that.navList[navIndex] != null){
+                            that.navList[navIndex].children.push(item)
+                        }else{
+                            // 跨级
+                            that.navList.push(item);
+                            navIndex+=2;
+                        }
                     }
                 });
                 return this.navList;

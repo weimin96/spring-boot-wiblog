@@ -26,3 +26,18 @@
 .el-dialog__body{
     /*padding: 0;*/
 }
+
+.pic-list-it{
+    height: 135px;
+    width: 240px;
+    display: inline-block;
+    position: relative;
+}
+
+
+.pic-list-it img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}

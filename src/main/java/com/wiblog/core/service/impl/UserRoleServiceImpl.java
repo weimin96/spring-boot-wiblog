@@ -1,6 +1,7 @@
 package com.wiblog.core.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wiblog.core.common.Constant;
 import com.wiblog.core.common.RoleEnum;
@@ -29,27 +30,21 @@ public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, UserRole> i
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public UserRoleServiceImpl(UserRoleMapper userRoleMapper, RedisTemplate<String, Object> redisTemplate) {
-        this.userRoleMapper = userRoleMapper;
+    public UserRoleServiceImpl(RedisTemplate<String, Object> redisTemplate, UserRoleMapper userRoleMapper) {
         this.redisTemplate = redisTemplate;
+        this.userRoleMapper = userRoleMapper;
     }
 
     @Override
-    public ServerResponse<?> assignPermission(User user, Long uid, Long id) {
+    public ServerResponse<?> assignPermission(User user, Long uid, Long[] ids) {
         // 分配权限
-        UserRole userRole = new UserRole();
-        userRole.setUid(uid);
-        userRole.setRoleId(id);
         try {
-            int count = userRoleMapper.insert(userRole);
-            if (count > 0) {
-                return ServerResponse.success(null, "权限分配成功");
-            }
+            userRoleMapper.delete(new QueryWrapper<UserRole>().lambda().eq(UserRole::getUid,uid));
+            userRoleMapper.insertBatch(uid, ids);
+            return ServerResponse.success(null, "权限分配成功");
         } catch (Exception e) {
             return ServerResponse.error("权限分配失败", 90003);
         }
-        return ServerResponse.error("权限分配失败", 90003);
-
     }
 
     @Override

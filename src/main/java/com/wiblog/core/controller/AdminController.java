@@ -19,7 +19,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.*;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 管理界面控制层
@@ -70,11 +73,16 @@ public class AdminController {
         int userCount = userService.count(new QueryWrapper<User>().eq("state", "1"));
         int articleCount = articleService.count(new QueryWrapper<Article>().eq("state", "1"));
         int commentCount = commentService.count(new QueryWrapper<Comment>().eq("state", "1"));
+        Map<String, Object> hitMap = articleService.getMap(new QueryWrapper<Article>().select("sum(hits) as sum").eq("state", "1"));
+        double hitCount = 0.0;
+        if (hitMap != null) {
+            hitCount = Double.parseDouble(String.valueOf(hitMap.get("sum")));
+        }
         Map<String, Object> result = new HashMap<>(5);
         result.put("userCount", userCount);
         result.put("articleCount", articleCount);
         result.put("commentCount", commentCount);
-        result.put("hitCount", 0);
+        result.put("hitCount", (int) hitCount);
         result.put("profitCount", 0);
         return ServerResponse.success(result);
     }

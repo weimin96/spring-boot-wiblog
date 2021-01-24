@@ -3,6 +3,7 @@ package com.wiblog.core.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.wiblog.core.entity.UserRole;
 import com.wiblog.core.vo.RoleVo;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,4 +31,13 @@ public interface UserRoleMapper extends BaseMapper<UserRole> {
      * @return List
      */
     List<RoleVo> selectRole();
+
+    /**
+     * 批量更新或插入
+     * @param uid uid
+     * @param ids ids
+     * @return int
+     */
+    int insertBatch(@Param("uid") Long uid, @Param("ids") Long[] ids);
+
 }

@@ -12,11 +12,11 @@ var app = new Vue({
         username: "",
         state: 1,
         // 所有文章标题
-        titleArray:[],
+        titleArray: [],
         // 所有用户名
-        nameArray:[],
+        nameArray: [],
         // 状态复选框
-        stateList:["正常"],
+        stateList: ["正常"],
         // 用户授权对话框
         roleDialogVisible: false,
         // 权限列表
@@ -24,10 +24,10 @@ var app = new Vue({
         // 被授权用户id
         roleUid: '',
         // 被授权用户角色id
-        userRoleId: ''
+        userRoleIds: [],
     },
-    beforeCreate(){
-       vm = this;
+    beforeCreate() {
+        vm = this;
     },
     mounted() {
         this.initCommentList();
@@ -35,20 +35,21 @@ var app = new Vue({
     },
     methods: {
         init: function () {
-            $.get("/u/getAllUsername",function (res) {
+            $.get("/u/getAllUsername", function (res) {
                 if (res.code === 10000) {
                     vm.nameArray = res.data;
                 }
             });
         },
         //列表
-        initCommentList:function(){
+        initCommentList: function () {
             $.post("/u/userManageListPage", {
-                username:this.username,
+                username: this.username,
                 state: this.state,
                 pageSize: this.pageSize,
                 pageNum: this.pageNum,
-                orderBy:this.orderBy}, function (res) {
+                orderBy: this.orderBy
+            }, function (res) {
                 if (res.code === 10000) {
                     vm.tableData = res.data.records;
                     vm.total = res.data.total;
@@ -58,10 +59,10 @@ var app = new Vue({
         dateFormatter: function (row, column) {
             let date = new Date(row.createTime);
             let year = date.getFullYear();
-            let month = change(date.getMonth()+1);
+            let month = change(date.getMonth() + 1);
             let day = change(date.getDate());
-            var hour=change(date.getHours());
-            var minute=change(date.getMinutes());
+            var hour = change(date.getHours());
+            var minute = change(date.getMinutes());
 
             function change(t) {
                 if (t < 10) {
@@ -70,10 +71,11 @@ var app = new Vue({
                     return t;
                 }
             }
-            return year + "/" + month + "/" + day+" "+hour+":"+minute;
+
+            return year + "/" + month + "/" + day + " " + hour + ":" + minute;
         },
         // 按用户名查找
-        queryNameSearch: function(queryString, cb) {
+        queryNameSearch: function (queryString, cb) {
             var nameArray = this.nameArray;
             var results = queryString ? nameArray.filter(this.createFilter(queryString)) : nameArray;
             // 调用 callback 返回建议列表的数据
@@ -90,67 +92,97 @@ var app = new Vue({
             this.pageNum = 1;
             this.initCommentList();
         },
-        nameIconClick(ev){
+        nameIconClick(ev) {
             this.pageNum = 1;
             this.initCommentList();
         },
         // 查看用户
-        handleView: function(index,row){
+        handleView: function (index, row) {
             var d = new Date(row.createTime);
-            window.parent.location.href = "/user/"+row.uid*12345;
+            window.parent.location.href = "/user/" + row.uid * 12345;
         },
         // 用户授权
-        handleEdit: function(index,row){
+        handleEdit: function (index, row) {
             this.roleUid = row.uid;
-            $.post("/role/getAllRole",function (res) {
-                if (res.code === 10000){
-                    vm.roleList = res.data;
-                    vm.roleDialogVisible = true;
-                }else{
-                    vm.$message.error(res.msg);
-                }
-            });
-            vm.userRoleId = '';
-            $.post("/role/getUserRole",{uid:row.uid},function (res) {
-                if (res.code === 10000){
-                    if(res.data!==undefined){
-                        vm.userRoleId = res.data.roleId;
+            new Promise(function (resolve, reject) {
+                $.post("/role/getAllRole", function (res) {
+                    if (res.code === 10000) {
+                        // 构造穿梭框数据
+                        const data = [];
+                        res.data.forEach(e => {
+                            data.push({
+                                key: e.roleId,
+                                label: e.name,
+                                disabled: false
+                            });
+                        })
+                        vm.roleList = data;
+                        resolve();
+                    } else {
+                        vm.$message.error(res.msg);
                     }
-                }
-            });
+                });
+            }).then(function () {
+                $.post("/role/getUserRole", {uid: row.uid}, function (res) {
+                    if (res.code === 10000) {
+                        vm.roleDialogVisible = true;
+                        // 拥有的权限
+                        vm.userRoleIds = [];
+                        res.data.forEach(e => {
+                            vm.userRoleIds.push(e.roleId)
+                        })
+                    } else {
+                        vm.$message.error(res.msg);
+                    }
+                });
+            })
+
+
         },
         // 确认授权
-        roleDialogEnter: function(){
-            $.post("/role/assignPermission",{uid:this.roleUid,roleId:this.userRoleId},function (res) {
-                if (res.code === 10000){
-                    vm.$message({message:"分配权限成功",type: 'success'});
-                    vm.roleDialogVisible = false;
-                }else {
-                    vm.$message.error(res.msg);
+        roleDialogEnter: function () {
+            $.ajax({
+                url: '/role/assignPermission',
+                data: {
+                    roleIds: this.userRoleIds,
+                    uid: this.roleUid
+                },
+                type: 'post',
+                traditional: true,
+                success: function (res) {
+                    if (res.code === 10000) {
+                        vm.$message({message: "分配权限成功", type: 'success'});
+                        vm.roleDialogVisible = false;
+                    }else{
+                        vm.$message.error(res.msg);
+                    }
+                },
+                error: function (res) {
+                    vm.$message.error("服务器异常");
                 }
-            });
+            })
         },
         // 用户注销
-        handleDelete: function(index,row){
-            $.post("/u/deleteUser",{id:row.uid},function (res) {
-                if(res.code === 10000){
-                    vm.$message({message:"注销用户成功",type: 'success'});
+        handleDelete: function (index, row) {
+            $.post("/u/deleteUser", {id: row.uid}, function (res) {
+                if (res.code === 10000) {
+                    vm.$message({message: "注销用户成功", type: 'success'});
                     vm.initCommentList();
                     vm.init();
-                }else{
+                } else {
                     vm.$message.error(res.msg);
                 }
             })
         },
         handlePageNum: function (val) {
-            this.pageNum=val;
+            this.pageNum = val;
             this.initCommentList();
         },
         // 时间排序
         sortChange: function (column) {
-            if(column.order === "ascending"){
+            if (column.order === "ascending") {
                 this.orderBy = "asc";
-            }else{
+            } else {
                 this.orderBy = "desc";
             }
             this.initCommentList();
