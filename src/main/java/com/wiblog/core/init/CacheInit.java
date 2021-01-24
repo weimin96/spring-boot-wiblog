@@ -7,6 +7,7 @@ import com.wiblog.core.entity.Article;
 import com.wiblog.core.entity.EsArticle;
 import com.wiblog.core.elastic.EsArticleRepository;
 import com.wiblog.core.service.IArticleService;
+import com.wiblog.core.utils.WiblogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,11 +88,15 @@ public class CacheInit {
             List<EsArticle> esArticleList = new ArrayList<>();
             articleList.forEach(it -> {
                 EsArticle esArticle = new EsArticle();
-                esArticle.setArticleId(it.getId());
-                esArticle.setCategoryId(it.getCategoryId());
-                esArticle.setContent(it.getContent());
-                esArticle.setTitle(it.getTitle());
-                esArticle.setUrl(it.getArticleUrl());
+                String content = WiblogUtil.mdToHtml(it.getContent());
+                content = content.replaceAll("<[^>]+>","");
+                content = content.replaceAll("\\s*|\t|\r|\n","");
+                esArticle.setContent(content)
+                        .setTitle(it.getTitle())
+                        .setUrl(it.getArticleUrl())
+                        .setCreateTime(it.getCreateTime().getTime())
+                        .setCategoryId(it.getCategoryId())
+                        .setArticleId(it.getId());
                 esArticleList.add(esArticle);
             });
             esArticleRepository.saveAll(esArticleList);

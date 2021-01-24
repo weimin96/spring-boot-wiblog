@@ -255,8 +255,16 @@ public class ArticleController extends BaseController {
             // 匹配到的字段
             for (Map.Entry<String, List<String>> stringHighlightFieldEntry : highlightFields.entrySet()) {
                 String key = stringHighlightFieldEntry.getKey();
+                List<String> matchList = stringHighlightFieldEntry.getValue();
+                StringBuilder matchValue = new StringBuilder();
                 if (fieldNames[1].equals(key)){
-                    String value = esArticle.getContent();
+                    for (int i = 0; i < matchList.size()&&i<2; i++) {
+                        if (i != 0){
+                            matchValue.append("......");
+                        }
+                        matchValue.append(matchList.get(i));
+                    }
+                    String value = matchValue.toString();
                     // 截取部分内容
                     Matcher mt = PATTERN_HIGH_LIGHT.matcher(value);
                     if (mt.find()){
@@ -267,7 +275,11 @@ public class ArticleController extends BaseController {
                     }else {
                         value = value.substring(0,Math.min(300,value.length()-1));
                     }
-                    esArticle.setContent(value);
+                    esArticle.setContent(value+"......");
+                }else if (fieldNames[0].equals(key)){
+                    for (int i = 0; i < matchList.size()&&i<1; i++) {
+                        esArticle.setTitle(matchList.get(i));
+                    }
                 }
             }
             resultList.add(esArticle);
