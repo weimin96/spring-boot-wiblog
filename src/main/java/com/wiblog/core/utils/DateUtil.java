@@ -16,12 +16,13 @@ public class DateUtil {
      * 直接使用SimpleDateFormat有线程安全问题
      * 使用ThreadLocal, 将共享变量变为独享
      */
-    private static final ThreadLocal<DateFormat> SDF_THREAD_LOCAL = new ThreadLocal<DateFormat>() {
-        @Override
-        public SimpleDateFormat initialValue() {
-            return new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+08:00");
-        }
-    };
+    private static final ThreadLocal<DateFormat> SDF_THREAD_LOCAL = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss+08:00"));
+
+    /**
+     * 直接使用SimpleDateFormat有线程安全问题
+     * 使用ThreadLocal, 将共享变量变为独享
+     */
+    private static final ThreadLocal<DateFormat> SIMPLE_THREAD_LOCAL = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
 
     /**
      * 转成utc格式
@@ -31,5 +32,15 @@ public class DateUtil {
      */
     public static String formatDate(Date date) {
         return SDF_THREAD_LOCAL.get().format(date);
+    }
+
+    /**
+     * 转成格式
+     *
+     * @param date date
+     * @return String
+     */
+    public static String formatSimpleDate(Date date) {
+        return SIMPLE_THREAD_LOCAL.get().format(date);
     }
 }
