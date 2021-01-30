@@ -142,7 +142,7 @@ public class CommentController extends BaseController {
      * @param id id
      * @return ServerResponse
      */
-    @GetMapping("getCommentById")
+    @GetMapping("/getCommentById")
     public ServerResponse<?> getCommentById(String id) {
         Map<String, Object> result = new HashMap<>();
         // 获取评论信息

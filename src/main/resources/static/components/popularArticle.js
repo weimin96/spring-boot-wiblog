@@ -5,7 +5,7 @@ const popularArticle = {
         '                            </div>\n' +
         '                            <div class="rank-list">\n' +
         '                                <ul>\n' +
-        '                                    <li v-for="(item,index) in rankList" :key="index"><a @click="gotoArticle(item.url)">{{item.title}}</a>' +
+        '                                    <li v-for="(item,index) in rankList" :key="index"><a @click="gotoArticle(item.articleUrl)">{{item.title}}</a>' +
         '<div>阅读{{item.score}}</div></li>\n' +
         '                                </ul>\n' +
         '                            </div>\n' +
