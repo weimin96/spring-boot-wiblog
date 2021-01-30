@@ -64,9 +64,9 @@ public class RecordScheduled {
         Map<String, Object> articleDetail = new HashMap<>(16);
 
         // 获取 点击率
-        Map<Object, Object> hitCache = redisTemplate.opsForHash().entries(Constant.RedisKey.HIT_RECORD_KEY);
+//        Map<Object, Object> hitCache = redisTemplate.opsForHash().entries(Constant.RedisKey.HIT_RECORD_KEY);
         // 获取 点赞数据
-        Map<Object, Object> likeCache = redisTemplate.opsForHash().entries(Constant.RedisKey.LIKE_RECORD_KEY);
+//        Map<Object, Object> likeCache = redisTemplate.opsForHash().entries(Constant.RedisKey.LIKE_RECORD_KEY);
 
         LambdaQueryWrapper<Article> queryWrapper = new QueryWrapper<Article>().lambda();
         queryWrapper.select(Article::getId, Article::getTitle, Article::getArticleUrl, Article::getHits, Article::getLikes).eq(Article::getState, "1").eq(Article::getPrivately, "0");
@@ -74,10 +74,10 @@ public class RecordScheduled {
         // 合并数据
         articleList.forEach(it -> {
             String id = String.valueOf(it.getId());
-            int hit = (Integer) hitCache.get(id) + it.getHits();
-            Integer like = (Integer) likeCache.get(id) + it.getLikes();
-            it.setHits(hit);
-            it.setLikes(like);
+            int hit = it.getHits();
+//            Integer like = (Integer) likeCache.get(id) + it.getLikes();
+//            it.setHits(hit);
+//            it.setLikes(like);
 
             // 更新排行榜
             redisTemplate.opsForZSet().add(Constant.RedisKey.ARTICLE_RANKING_KEY, id, hit);

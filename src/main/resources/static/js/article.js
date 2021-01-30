@@ -91,6 +91,16 @@
             this.$bus.emit('popular-article-init');
         },
         methods: {
+            // 评论定位
+            positionComment() {
+              const commentId = getQueryVariable('comment');
+              if (commentId === '') {
+                  return;
+              }
+              $.post('/getCommentById', {}, function (res) {
+                  
+              })
+            },
             // 生成目录
             getNavTree(content) {
                 let tempArr = [];
