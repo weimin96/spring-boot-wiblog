@@ -63,6 +63,14 @@ body{
     font-size: 15px;
 }
 
+.article-content h2{
+    font-size: 20px;
+    background-image: url(http://image.woshipm.com/fp/images/h1.svg);
+    background-repeat: no-repeat;
+    background-position: 0 7px;
+    padding-left: 25px;
+}
+
 /*评论*/
 .comment-title {
     font-size: 17px;
