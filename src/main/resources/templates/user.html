@@ -98,7 +98,7 @@
                             </el-col>
                             <el-col :span="16" >
                                 <template v-if="sidebarActive === 'message'">
-                                    <el-tabs v-model="activeName">
+                                    <el-tabs v-model="activeName" class="reply-content">
                                         <el-tab-pane label="我的回复" name="first">
                                             <div class="order">
                                                 <div class="pull-right">
@@ -179,7 +179,7 @@
                                                 </div>
                                                 <div class="comment-content">{{item.content}}</div>
                                                 <div class="comment-parent"
-                                                     v-if="item.username !== undefined">
+                                                     v-if="item.username !== undefined && item.state !== undefined">
                                                     <div>
                                                         <span>{{user.username}}：</span>
                                                         <span v-if="item.state === 1">{{item.parentContent}}</span>
@@ -194,7 +194,7 @@
                                             <div style="text-align: right;">
                                                 <el-pagination
                                                         small
-                                                        @current-change="userCommentHandlePageNum"
+                                                        @current-change="userReplyHandlePageNum"
                                                         :current-page="userReplyPageNum"
                                                         :page-size="userReplyPageSize"
                                                         layout="prev, pager, next"
@@ -288,7 +288,7 @@
                                     </el-tabs>
                                 </template>
                                 <template v-if="sidebarActive === 'userSetting'">
-                                    <el-tabs v-model="userSettingActiveName" >
+                                    <el-tabs v-model="userSettingActiveName" class="setting-content">
                                         <el-tab-pane label="个人信息" name="first" >
                                             <div class="user-setting-left">
                                                     <div class="user-setting-li">

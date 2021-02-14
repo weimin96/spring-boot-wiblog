@@ -344,11 +344,14 @@
     color: #c0c4cc;
 }
 
-.el-tabs__content{
+.reply-content .el-tabs__content, .setting-content .el-tabs__content{
     padding: 10px;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
     border-radius: 2px;
     overflow: inherit;
+}
+
+.setting-content .el-tabs__content{
     position: absolute;
     width: 65.3%;
 }

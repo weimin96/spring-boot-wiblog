@@ -127,7 +127,7 @@ public class LogWebSocket {
 
         }
         Thread future = futures.get(session.getId());
-        future.stop();
+        future.interrupt();
 //        log.info("线程{}",future.isCancelled());
         if (session != null && session.isOpen()) {
             log.info(session.getId());

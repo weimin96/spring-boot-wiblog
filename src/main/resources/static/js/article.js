@@ -340,6 +340,9 @@
                 return result + month + "." + day + " " + hour + ":" + minute;
             },
             articleDateFormat: function (d) {
+                if (d === "") {
+                    return ""
+                }
                 var date = new Date(d);
                 var year = date.getFullYear();
                 var month = change(date.getMonth() + 1);

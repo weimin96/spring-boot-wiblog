@@ -30,11 +30,11 @@ let app = new Vue({
             }
             $.post('/u/login', {
                 account: app.account,
-                password: app.password
+                password: md5(app.password)
             },function (res) {
                 if (res.code === 10000){
                     let url = Cookies.get('back');
-                    if(url !== undefined){
+                    if(url !== undefined && !url.endsWith('register')){
                         location.href = url;
                     }else{
                         location.href = "/";

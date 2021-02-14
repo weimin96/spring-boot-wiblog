@@ -257,7 +257,7 @@ let app = new Vue({
                     && this.checkConfirmPassword()) {
                     let data = {
                         username: app.username,
-                        password: app.password
+                        password: md5(app.password)
                     };
                     if (app.phone !== '') {
                         data.phone = app.phone;
