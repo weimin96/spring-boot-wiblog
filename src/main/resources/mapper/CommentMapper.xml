@@ -99,6 +99,14 @@ id, uid, article_id, parent_id,gen_id,floor, likes, content, state,create_time, 
         left join article as a on c1.article_id = a.id
         left join `user` as u1 on c1.uid = u1.uid
         where c2.uid = #{uid} and c1.state = 1
+        union
+        select c1.id,c1.content,c1.create_time,c1.likes,
+        null ,null,
+        u1.username,
+        a.article_url,a.title from `comment` as c1
+        left join article as a on c1.article_id = a.id
+        left join `user` as u1 on c1.uid = u1.uid
+		where a.uid = #{uid} and c1.state = 1
     </select>
 
     <update id="updateUid">

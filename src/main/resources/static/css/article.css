@@ -65,10 +65,27 @@ body{
 
 .article-content h2{
     font-size: 20px;
-    background-image: url(http://image.woshipm.com/fp/images/h1.svg);
+    background-image: url(../img/h2.svg);
     background-repeat: no-repeat;
     background-position: 0 7px;
     padding-left: 25px;
+}
+
+.article-content h3{
+    font-size: 18px;
+    background-image: url(../img/h3.svg);
+    background-repeat: no-repeat;
+    color: rgba(0,0,0,.68);
+    padding-left: 15px;
+    background-position: 0 6px;
+}
+
+.article-content h2, .article-content h3{
+    font-weight: 700;
+    margin-top: 30px;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    background-repeat: no-repeat;
 }
 
 /*评论*/
@@ -380,14 +397,13 @@ a:hover {
 
 /*引用*/
 blockquote{
-    border: none;
-    color: #314659;
-    margin: 20px 0;
-    padding: 0 0 0 10px;
-    min-height: 20px;
-    background: 0 0;
-    line-height: inherit;
-    border-left: 4px solid #dde5f1
+    background-image: url(../img/b.svg);
+    background-repeat: no-repeat;
+    background-position: left 30px top 20px;
+    background-color: #f8f8f8;
+    color: rgba(0,0,0,.68);
+    margin: 30px 0;
+    padding: 40px 30px 20px;
 }
 
 p {
@@ -396,12 +412,7 @@ p {
     font-size: 16px;
 }
 
-h3{
-    color: #1669b0;
-    font-weight: bold;
-    line-height: 1.5;
-    margin: 10px 0;
-}
+
 
 h4{
     font-weight: bold;
@@ -432,4 +443,8 @@ pre code{
 
 #content ol li{
     list-style: decimal;
+}
+
+#content a{
+    color: #2fa4e7;
 }

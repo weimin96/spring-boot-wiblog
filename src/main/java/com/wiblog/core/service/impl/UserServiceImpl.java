@@ -78,7 +78,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         } else {
             userAuth.setIdentityType("username");
         }
-        password = Md5Util.MD5(password);
+//        password = Md5Util.MD5(password);
         userAuth.setPassword(password);
         userAuth.setIdentifier(account);
         User user = userAuthMapper.login(userAuth);
@@ -109,7 +109,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         } else {
             throw new WiblogException("密码长度必须大于6位");
         }
-        password = Md5Util.MD5(password);
+//        password = Md5Util.MD5(password);
 
         // 校验手机号
         if (StringUtils.isNotBlank(phone)) {

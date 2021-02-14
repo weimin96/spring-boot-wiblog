@@ -121,8 +121,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         orderBy(page, orderBy);
         IPage<UserCommentVo> list;
         if ("comment".equals(type)) {
+            // 我的回复
             list = commentMapper.selectCommentByUid(page, uid);
         } else {
+            // 回复我的
             list = commentMapper.selectUserReplyByUid(page, uid);
         }
 

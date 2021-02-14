@@ -262,7 +262,7 @@ let app = new Vue({
         commentDateFormat: function (d) {
             var date = new Date(d);
             var year = date.getFullYear();
-            var month = change(date.getMonth());
+            var month = change(date.getMonth()+1);
             var day = change(date.getDate());
             var hour = change(date.getHours());
             var minute = change(date.getMinutes());
