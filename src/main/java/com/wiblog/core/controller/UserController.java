@@ -18,6 +18,8 @@ import com.wiblog.core.utils.WiblogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/u")
 @Slf4j
+@PropertySource(value = "classpath:/wiblog.properties", encoding = "utf-8")
 public class UserController extends BaseController {
 
     private final RedisTemplate<String, Object> redisTemplate;
@@ -47,6 +50,9 @@ public class UserController extends BaseController {
     private final IUserRoleService userRoleService;
 
     private final GithubProvider githubProvider;
+
+    @Value("${github.authorize.uri}")
+    private String githubAuthorizeUri;
 
     @Autowired
     public UserController(IUserService userService, GithubProvider githubProvider, RedisTemplate<String, Object> redisTemplate, IUserRoleService userRoleService) {
@@ -251,6 +257,10 @@ public class UserController extends BaseController {
         }
     }
 
+    @PostMapping("/getGithubUrl")
+    public ServerResponse<?> getGithubUrl(String type) {
+        return ServerResponse.success(githubAuthorizeUri + type);
+    }
 
     @GetMapping("/getBindingList")
     public ServerResponse<?> getBindingList(HttpServletRequest request) {
