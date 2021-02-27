@@ -198,8 +198,12 @@ let app = new Vue({
             });
         },
         bingGithub(){
-            Cookies.set('back',window.location.href,{ expires: 1, path: '/' });
-            window.location.href="https://github.com/login/oauth/authorize?client_id=9d543dc4501558c6759f&redirect_uri=https://www.wiblog.cn/u/github/callback&response_type=code&state=banding";
+            $.post('/u/getGithubUrl', {type: 'banding'},function (res) {
+                if (res.code === 10000){
+                    Cookies.set('back',window.location.href,{ expires: 1, path: '/' });
+                    window.location.href = res.data;
+                }
+            })
         },
         unBinding(type){
             this.$confirm('是否取消绑定?', '提示', {

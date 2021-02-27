@@ -46,7 +46,11 @@ let app = new Vue({
             })
         },
         githubLogin(){
-            window.location.href = "https://github.com/login/oauth/authorize?client_id=9d543dc4501558c6759f&redirect_uri=https://www.wiblog.cn/u/github/callback&response_type=code&state=login";
+            $.post('/u/getGithubUrl', {type: 'login'},function (res) {
+                if (res.code === 10000){
+                    window.location.href = res.data;
+                }
+            })
         },
         wechatCode(){
             console.log("验证码"+this.code);

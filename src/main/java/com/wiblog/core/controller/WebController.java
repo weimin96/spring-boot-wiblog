@@ -11,6 +11,7 @@ import com.wiblog.core.service.ICategoryService;
 import com.wiblog.core.service.IUserRoleService;
 import com.wiblog.core.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 @Controller
 @Slf4j
+@PropertySource(value = "classpath:/wiblog.properties", encoding = "utf-8")
 public class WebController extends BaseController {
 
     private final IArticleService articleService;
@@ -128,7 +130,7 @@ public class WebController extends BaseController {
     /**
      * 后台主页框架
      */
-    @GetMapping("/admin")
+    @GetMapping("${admin-url}")
     public String adminIndex() {
         return "admin/index";
     }

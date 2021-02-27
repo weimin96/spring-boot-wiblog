@@ -6,6 +6,8 @@ import com.wiblog.core.service.IUserRoleService;
 import com.wiblog.core.service.IUserService;
 import com.wiblog.core.utils.IPUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -20,11 +22,15 @@ import javax.servlet.http.HttpServletResponse;
  */
 @Component
 @Slf4j
+@PropertySource(value = "classpath:/wiblog.properties", encoding = "utf-8")
 public class BaseInterceptor implements HandlerInterceptor {
 
     private final IUserService userService;
 
     private final IUserRoleService userRoleService;
+
+    @Value("${admin-url}")
+    private String adminUrl;
 
     public BaseInterceptor(IUserService userService, IUserRoleService userRoleService) {
         this.userService = userService;
@@ -39,7 +45,7 @@ public class BaseInterceptor implements HandlerInterceptor {
         //请求拦截处理
         User user = userService.loginUser(request);
         // 没有管理员权限不允许访问admin
-        if (uri.startsWith("/admin") && !userRoleService.checkAuthorize(user, RoleEnum.ADMIN).isSuccess()) {
+        if (uri.startsWith(adminUrl) && !userRoleService.checkAuthorize(user, RoleEnum.ADMIN).isSuccess()) {
             response.sendRedirect(request.getContextPath() + "/");
             log.info("没有权限访问admin,来路地址: {}", IPUtil.getIpAddr(request));
             return false;

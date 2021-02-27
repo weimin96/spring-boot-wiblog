@@ -18,9 +18,11 @@
 
                 <el-upload
                         class="img-uploader"
-                        action="/uploadImage"
+                        action="void"
+                        :http-request="uploadImage"
                         :show-file-list="false"
-                        :on-success="uploadImgSuccess"
+                        :on-progress="progressA"
+                        v-loading.fullscreen.lock="imgLoading"
                         accept=".jpg,.png,.jpeg">
                     <img v-if="article.imgUrl" :src="article.imgUrl" class="article-img">
                     <i v-else class="el-icon-plus img-uploader-icon">上传题图</i>

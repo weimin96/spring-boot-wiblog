@@ -27,7 +27,8 @@ var app = new Vue({
             comment: true
         },
         editor: {},
-        pushLoading: false
+        pushLoading: false,
+        imgLoading: false
     },
     beforeCreate() {
         vm = this;
@@ -207,9 +208,27 @@ var app = new Vue({
         changeCategory: function (value) {
             this.article.categoryId=value[value.length-1]
         },
-        // 上传图片成功
-        uploadImgSuccess(res, file) {
-            this.article.imgUrl = res.data;
-        }
+        // 上传图片
+        uploadImage(file) {
+            this.imgLoading = true
+            let formData = new FormData();
+            formData.append('file', file.file);
+            axios({
+                url: '/uploadImage',
+                method: 'post',
+                data: formData,
+                //上传进度
+                onUploadProgress: (progressEvent) => {
+                    let num = progressEvent.loaded / progressEvent.total * 100 | 0;  //百分比
+                    file.onProgress({percent: num})     //进度条
+                }
+            }).then(data => {
+                file.onSuccess(); //上传成功(打钩的小图标)
+                this.article.imgUrl = data.data.data;
+                this.imgLoading = false
+            })
+        },
+        /**     文件正在上传时的钩子    **/
+        progressA(event, file) {},
     }
 });
