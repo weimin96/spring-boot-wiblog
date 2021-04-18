@@ -84,6 +84,9 @@ let vue = new Vue({
             $("#searchInput").focus();
         },
         blurSearch() {
+            if (this.searchInput.trim() !== ""){
+                return;
+            }
             this.focusSearchLabel = false;
             this.searchInput = "";
         },

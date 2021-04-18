@@ -511,7 +511,7 @@ header .nav-search label{
 #footer {
     background: #23282D;
     padding: 40px 0 30px;
-    margin-top: 114px;
+    /*margin-top: 114px;*/
 }
 
 #footer p {

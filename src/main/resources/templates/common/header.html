@@ -65,7 +65,7 @@
                         <i @click="search()"></i>
                         <span>
                             <input id="searchInput" v-on:keyup.enter="search()" v-model="searchInput" @blur="blurSearch()" autocomplete="false">
-                            <label @click="focusSearch()" v-show="focusSearchLabel !== true">搜索文章</label>
+                            <label @click="focusSearch()" v-show="!focusSearchLabel">搜索文章</label>
                         </span>
 
                     </div>
@@ -86,8 +86,8 @@
 
     <script th:inline="javascript">
         var user = [[${user}]];
-        console.log("用户信息");
-        console.log(user);
+        // console.log("用户信息");
+        // console.log(user);
     </script>
 
 </div>

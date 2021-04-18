@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:http="http://www.w3.org/1999/xhtml"
-      xmlns:v-bind="http://www.w3.org/1999/xhtml">
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:v-on="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity3">
 <head th:replace="common/head :: head(~{::title},~{::link},~{})">
     <title>wiblog - Areo的个人网站</title>
     <link rel="stylesheet" th:href="@{css/index.css}">
@@ -17,7 +18,7 @@
         <!--body-->
         <div id="post-list">
             <el-row :gutter="20">
-                <el-col :span="14" :offset="3">
+                <el-col :span="14" :offset="3" style="min-height: 361px;">
                     <template v-for="item in articleList">
                         <article class="post-card">
                             <div class="post-list-pic">
