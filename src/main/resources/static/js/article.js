@@ -136,7 +136,7 @@
                             that.article = res.data;
                             that.author = res.data.author;
                             that.tagList = res.data.tags.slice().split(/[\n\s+,，]/g);
-                            let htmlContent = marked(that.article.content);
+                            let htmlContent = marked.parse(that.article.content);
                             document.getElementById('content').innerHTML = htmlContent;
                             that.navList = that.getNavTree(htmlContent);
                             // 点赞
