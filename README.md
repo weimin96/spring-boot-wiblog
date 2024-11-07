@@ -7,8 +7,6 @@
 
 ## 界面效果
 
-> 线上地址：[https://www.wiblog.cn/](https://www.wiblog.cn/)
-
 - 首页
 
 ![首页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20210119233651-首页.png)
