@@ -9,62 +9,62 @@
 
 - 首页
 
-![首页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20210119233651-首页.png)
+![首页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20210119233651-首页.png)
 
 - 文章页
 
-![文章页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20210119233659-文章页.png)
+![文章页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20210119233659-文章页.png)
 
 - 个人中心
 
-![个人中心](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20210119234247-个人中心.png)
+![个人中心](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20210119234247-个人中心.png)
 
 - 登录页
 
-![登录页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20210119234241-登录页.png)
+![登录页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20210119234241-登录页.png)
 
 - 注册页
 
-![注册页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20210119234231-注册页.png)
+![注册页](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20210119234231-注册页.png)
 
 
 管理界面：
 
 - 概览页
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321220710-1.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20200321220710-1.png)
 
 - 用户管理
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321220716-2.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20200321220716-2.png)
 
 - 文章列表
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321220719-3.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20200321220719-3.png)
 
 - 文章编辑
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321220723-4.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20200321220723-4.png)
 
 - 评论管理
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321220730-5.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20200321220730-5.png)
 
 - 分类管理
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321220734-6.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20200321220734-6.png)
 
 - 图片管理
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321220737-7.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20200321220737-7.png)
 
 - 日志管理
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20200321220742-8.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20200321220742-8.png)
 
 ## 功能概览
 
-![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/20210119233338-wiblog-nt.png)
+![image](https://wiblog-1251822424.cos.ap-guangzhou.myqcloud.com/other/20210119233338-wiblog-nt.png)
 
 ## 技术栈
 
